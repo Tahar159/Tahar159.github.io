@@ -4,12 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Tahar Website</title>
+<title>Tahar Galaxy Website</title>
 
 <!-- THREE.JS -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
-<!-- PARTICLES.JS -->
+<!-- PARTICLES -->
 <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
 
 <style>
@@ -20,6 +20,7 @@ padding:0;
 box-sizing:border-box;
 scroll-behavior:smooth;
 font-family:Arial;
+cursor:none;
 }
 
 body{
@@ -29,7 +30,7 @@ overflow-x:hidden;
 position:relative;
 }
 
-/* GALAXY PARTICLES */
+/* PARTICLES */
 
 #particles-js{
 position:fixed;
@@ -41,7 +42,28 @@ z-index:-5;
 background:#050816;
 }
 
-/* LOADING SCREEN */
+/* STARS */
+
+.stars{
+position:fixed;
+width:100%;
+height:100%;
+background:url('https://www.transparenttextures.com/patterns/stardust.png');
+opacity:0.25;
+z-index:-4;
+animation:moveStars 100s linear infinite;
+}
+
+@keyframes moveStars{
+from{
+transform:translateY(0);
+}
+to{
+transform:translateY(-2000px);
+}
+}
+
+/* LOADER */
 
 #loader{
 position:fixed;
@@ -106,9 +128,10 @@ z-index:1000;
 }
 
 .logo{
-font-size:28px;
+font-size:30px;
 font-weight:bold;
 color:#00ffff;
+text-shadow:0 0 15px #00ffff;
 }
 
 nav ul{
@@ -142,36 +165,55 @@ overflow:hidden;
 }
 
 .profile{
-width:180px;
-height:180px;
+width:190px;
+height:190px;
 border-radius:50%;
 object-fit:cover;
 border:5px solid #00ffff;
-box-shadow:0 0 30px #00ffff;
+box-shadow:0 0 40px #00ffff;
 margin-bottom:20px;
 animation:float 3s infinite alternate;
 z-index:2;
 }
 
 @keyframes float{
-from{transform:translateY(0);}
-to{transform:translateY(-15px);}
+from{
+transform:translateY(0);
+}
+to{
+transform:translateY(-15px);
+}
 }
 
 .hero h1{
-font-size:70px;
+font-size:75px;
 margin-bottom:20px;
 z-index:2;
+background:linear-gradient(90deg,#00ffff,#ffffff,#00ffff);
+-webkit-background-clip:text;
+-webkit-text-fill-color:transparent;
+background-size:200%;
+animation:shine 5s linear infinite;
+}
+
+@keyframes shine{
+0%{
+background-position:0%;
+}
+100%{
+background-position:200%;
+}
 }
 
 .typing{
-font-size:28px;
+font-size:30px;
 color:#00ffff;
 height:40px;
 z-index:2;
+text-shadow:0 0 10px #00ffff;
 }
 
-/* THREE.JS */
+/* THREE */
 
 #threejs-container{
 position:absolute;
@@ -205,7 +247,7 @@ font-weight:bold;
 
 button:hover{
 transform:scale(1.1);
-box-shadow:0 0 20px #00ffff;
+box-shadow:0 0 25px #00ffff;
 }
 
 /* SECTIONS */
@@ -215,11 +257,20 @@ padding:100px 50px;
 text-align:center;
 position:relative;
 z-index:2;
+opacity:0;
+transform:translateY(50px);
+transition:1s;
+}
+
+.section.show{
+opacity:1;
+transform:translateY(0);
 }
 
 .section h2{
-font-size:50px;
+font-size:55px;
 margin-bottom:50px;
+color:#00ffff;
 }
 
 /* CARDS */
@@ -234,21 +285,24 @@ flex-wrap:wrap;
 .card{
 width:300px;
 padding:30px;
-border-radius:20px;
-background:rgba(255,255,255,0.08);
-backdrop-filter:blur(10px);
+border-radius:25px;
+background:rgba(255,255,255,0.05);
+border:1px solid rgba(255,255,255,0.1);
+backdrop-filter:blur(20px);
 transition:0.5s;
 transform-style:preserve-3d;
+box-shadow:0 0 20px rgba(0,255,255,0.1);
 }
 
 .card:hover{
 transform:rotateY(15deg) rotateX(10deg) scale(1.05);
-box-shadow:0 0 30px rgba(0,255,255,0.5);
+box-shadow:0 0 35px rgba(0,255,255,0.5);
 }
 
 .card h3{
 margin-bottom:20px;
 font-size:28px;
+color:#00ffff;
 }
 
 /* CONTACT */
@@ -268,11 +322,33 @@ border-radius:10px;
 background:rgba(255,255,255,0.1);
 color:white;
 font-size:16px;
+outline:none;
 }
 
 textarea{
 height:150px;
 resize:none;
+}
+
+/* SOCIALS */
+
+.socials{
+display:flex;
+justify-content:center;
+gap:25px;
+margin-top:40px;
+}
+
+.socials a{
+color:#00ffff;
+text-decoration:none;
+font-size:22px;
+transition:0.3s;
+}
+
+.socials a:hover{
+transform:scale(1.2);
+color:white;
 }
 
 /* CHATBOT */
@@ -352,20 +428,68 @@ gap:10px;
 flex:1;
 }
 
+/* CUSTOM CURSOR */
+
+.cursor{
+width:20px;
+height:20px;
+border:2px solid #00ffff;
+border-radius:50%;
+position:fixed;
+pointer-events:none;
+z-index:9999;
+transform:translate(-50%,-50%);
+}
+
+/* MOBILE */
+
+@media(max-width:768px){
+
+.hero h1{
+font-size:45px;
+}
+
+.typing{
+font-size:20px;
+}
+
+.cards{
+flex-direction:column;
+align-items:center;
+}
+
+nav{
+padding:20px;
+}
+
+nav ul{
+gap:15px;
+}
+
+.chat-window{
+width:90%;
+right:5%;
+}
+
+}
+
 </style>
 </head>
 
 <body>
 
-<!-- PARTICLES -->
+<div class="stars"></div>
+
 <div id="particles-js"></div>
+
+<div class="cursor" id="cursor"></div>
 
 <!-- LOADER -->
 
 <div id="loader">
 
 <div class="loader-text">
-Welcome to Tahar's Website 🚀 ...
+Welcome To Tahar Galaxy 🚀
 </div>
 
 <div class="loading-bar">
@@ -402,7 +526,7 @@ Welcome to Tahar's Website 🚀 ...
 
 <div class="buttons">
 
-<button onclick="alert('Welcome to the galaxy 🚀')">
+<button onclick="alert('Welcome To Tahar Galaxy 🚀')">
 Explore
 </button>
 
@@ -424,17 +548,17 @@ Contact
 
 <div class="card">
 <h3>AI Website</h3>
-<p>Modern futuristic AI projects.</p>
+<p>Modern futuristic AI projects with Gemini integration.</p>
 </div>
 
 <div class="card">
 <h3>3D Environment</h3>
-<p>Three.js galaxy animations.</p>
+<p>Advanced Three.js galaxy animations and interactions.</p>
 </div>
 
 <div class="card">
 <h3>Game Development</h3>
-<p>Interactive JavaScript mini games.</p>
+<p>Interactive JavaScript games and futuristic interfaces.</p>
 </div>
 
 </div>
@@ -461,6 +585,14 @@ Send Message
 
 </form>
 
+<div class="socials">
+
+<a href="#">Instagram</a>
+<a href="#">GitHub</a>
+<a href="#">TikTok</a>
+
+</div>
+
 </section>
 
 <!-- CHATBOT -->
@@ -478,7 +610,7 @@ AI Assistant
 <div class="chat-messages" id="chatMessages">
 
 <div class="bot-message">
-Hello 👋 Welcome to Tahar's galaxy website.
+Hello 👋 Welcome to Tahar Galaxy Website.
 </div>
 
 </div>
@@ -515,7 +647,7 @@ document.getElementById("loader").style.display="none";
 
 };
 
-/* TYPING EFFECT */
+/* TYPING */
 
 const text =
 "Future AI Web Developer 🚀";
@@ -538,9 +670,21 @@ setTimeout(typing,100);
 
 typing();
 
+/* CURSOR */
+
+const cursor =
+document.getElementById("cursor");
+
+document.addEventListener("mousemove",(e)=>{
+
+cursor.style.left = e.clientX + "px";
+cursor.style.top = e.clientY + "px";
+
+});
+
 /* CHATBOT */
 
-const API_KEY = "AIzaSyCp_rDtbSNwCsE1NH8vvp8hJgN42cXaGvk";
+const API_KEY = "PASTE_YOUR_NEW_API_KEY_HERE";
 
 function toggleChat(){
 
@@ -594,16 +738,16 @@ try{
 const response = await fetch(
 `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEY}`,
 {
-method: "POST",
+method:"POST",
 
-headers: {
-"Content-Type": "application/json"
+headers:{
+"Content-Type":"application/json"
 },
 
-body: JSON.stringify({
-contents: [{
-parts: [{
-text: text
+body:JSON.stringify({
+contents:[{
+parts:[{
+text:text
 }]
 }]
 })
@@ -630,7 +774,7 @@ JSON.stringify(data.error);
 }catch(error){
 
 bot.innerText =
-"Error connecting to Gemini AI 🚀";
+"Error Connecting To Gemini AI 🚀";
 
 }
 
@@ -638,7 +782,6 @@ messages.scrollTop =
 messages.scrollHeight;
 
 }
-
 
 /* THREE.JS */
 
@@ -699,92 +842,109 @@ animate();
 
 particlesJS("particles-js", {
 
-"particles": {
+particles:{
 
-"number": {
-"value": 120,
-"density": {
-"enable": true,
-"value_area": 800
+number:{
+value:120,
+density:{
+enable:true,
+value_area:800
 }
 },
 
-"color": {
-"value": "#00ffff"
+color:{
+value:"#00ffff"
 },
 
-"shape": {
-"type": "circle"
+shape:{
+type:"circle"
 },
 
-"opacity": {
-"value": 0.5,
-"random": true
+opacity:{
+value:0.5,
+random:true
 },
 
-"size": {
-"value": 3,
-"random": true
+size:{
+value:3,
+random:true
 },
 
-"line_linked": {
-"enable": true,
-"distance": 150,
-"color": "#00ffff",
-"opacity": 0.2,
-"width": 1
+line_linked:{
+enable:true,
+distance:150,
+color:"#00ffff",
+opacity:0.2,
+width:1
 },
 
-"move": {
-"enable": true,
-"speed": 2,
-"direction": "none",
-"random": false,
-"straight": false,
-"out_mode": "out",
-"bounce": false
+move:{
+enable:true,
+speed:2
 }
 
 },
 
-"interactivity": {
+interactivity:{
 
-"detect_on": "canvas",
+detect_on:"canvas",
 
-"events": {
+events:{
 
-"onhover": {
-"enable": true,
-"mode": "grab"
+onhover:{
+enable:true,
+mode:"grab"
 },
 
-"onclick": {
-"enable": true,
-"mode": "push"
+onclick:{
+enable:true,
+mode:"push"
 },
 
-"resize": true
+resize:true
 
 },
 
-"modes": {
+modes:{
 
-"grab": {
-"distance": 200,
-"line_linked": {
-"opacity": 0.5
+grab:{
+distance:200,
+line_linked:{
+opacity:0.5
 }
 },
 
-"push": {
-"particles_nb": 5
+push:{
+particles_nb:5
 }
 
 }
 
 },
 
-"retina_detect": true
+retina_detect:true
+
+});
+
+/* SCROLL ANIMATION */
+
+const sections =
+document.querySelectorAll(".section");
+
+window.addEventListener("scroll",()=>{
+
+sections.forEach(section=>{
+
+const top =
+section.getBoundingClientRect().top;
+
+if(top < window.innerHeight - 100){
+
+section.classList.add("show");
+
+}
+
+});
 
 });
 
