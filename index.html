@@ -4,9 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Ultra Futuristic Website</title>
+<title>Galaxy Futuristic Website</title>
 
+<!-- THREE.JS -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+<!-- PARTICLES.JS -->
+<script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
 
 <style>
 
@@ -22,6 +26,19 @@ body{
 background:#050816;
 color:white;
 overflow-x:hidden;
+position:relative;
+}
+
+/* GALAXY PARTICLES */
+
+#particles-js{
+position:fixed;
+width:100%;
+height:100%;
+top:0;
+left:0;
+z-index:-5;
+background:#050816;
 }
 
 /* LOADING SCREEN */
@@ -154,7 +171,7 @@ height:40px;
 z-index:2;
 }
 
-/* 3D CANVAS */
+/* THREE.JS */
 
 #threejs-container{
 position:absolute;
@@ -196,6 +213,8 @@ box-shadow:0 0 20px #00ffff;
 .section{
 padding:100px 50px;
 text-align:center;
+position:relative;
+z-index:2;
 }
 
 .section h2{
@@ -338,12 +357,15 @@ flex:1;
 
 <body>
 
+<!-- PARTICLES -->
+<div id="particles-js"></div>
+
 <!-- LOADER -->
 
 <div id="loader">
 
 <div class="loader-text">
-Loading Future...
+Loading Galaxy...
 </div>
 
 <div class="loading-bar">
@@ -380,7 +402,7 @@ Loading Future...
 
 <div class="buttons">
 
-<button onclick="alert('Welcome to the future 🚀')">
+<button onclick="alert('Welcome to the galaxy 🚀')">
 Explore
 </button>
 
@@ -407,7 +429,7 @@ Contact
 
 <div class="card">
 <h3>3D Environment</h3>
-<p>Three.js futuristic animations.</p>
+<p>Three.js galaxy animations.</p>
 </div>
 
 <div class="card">
@@ -429,9 +451,9 @@ Contact
 
 <input type="text" placeholder="Your Name">
 
-<input type="email" placeholder="Your Email to Tahar">
+<input type="email" placeholder="Your Email">
 
-<textarea placeholder="Your Message to Tahar"></textarea>
+<textarea placeholder="Your Message"></textarea>
 
 <button type="submit">
 Send Message
@@ -456,7 +478,7 @@ AI Assistant
 <div class="chat-messages" id="chatMessages">
 
 <div class="bot-message">
-Hello 👋 How can I help you?
+Hello 👋 Welcome to Tahar's galaxy website.
 </div>
 
 </div>
@@ -556,21 +578,8 @@ document.createElement("div");
 
 bot.className="bot-message";
 
-if(text.toLowerCase().includes("hello")){
-
 bot.innerText =
-"Hello 👋 Welcome to Tahar's futuristic website.";
-
-}else if(text.toLowerCase().includes("project")){
-
-bot.innerText =
-"Tahar creates AI and 3D web projects 🚀";
-
-}else{
-
-bot.innerText =
-"Interesting 🚀";
-}
+"Galaxy AI Assistant 🚀";
 
 messages.appendChild(bot);
 
@@ -635,6 +644,99 @@ renderer.render(scene,camera);
 }
 
 animate();
+
+/* PARTICLES */
+
+particlesJS("particles-js", {
+
+"particles": {
+
+"number": {
+"value": 120,
+"density": {
+"enable": true,
+"value_area": 800
+}
+},
+
+"color": {
+"value": "#00ffff"
+},
+
+"shape": {
+"type": "circle"
+},
+
+"opacity": {
+"value": 0.5,
+"random": true
+},
+
+"size": {
+"value": 3,
+"random": true
+},
+
+"line_linked": {
+"enable": true,
+"distance": 150,
+"color": "#00ffff",
+"opacity": 0.2,
+"width": 1
+},
+
+"move": {
+"enable": true,
+"speed": 2,
+"direction": "none",
+"random": false,
+"straight": false,
+"out_mode": "out",
+"bounce": false
+}
+
+},
+
+"interactivity": {
+
+"detect_on": "canvas",
+
+"events": {
+
+"onhover": {
+"enable": true,
+"mode": "grab"
+},
+
+"onclick": {
+"enable": true,
+"mode": "push"
+},
+
+"resize": true
+
+},
+
+"modes": {
+
+"grab": {
+"distance": 200,
+"line_linked": {
+"opacity": 0.5
+}
+},
+
+"push": {
+"particles_nb": 5
+}
+
+}
+
+},
+
+"retina_detect": true
+
+});
 
 </script>
 
