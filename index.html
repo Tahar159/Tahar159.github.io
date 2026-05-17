@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Futuristic Website</title>
+<title>Futuristic AI Website</title>
 
 <style>
 
@@ -224,7 +224,7 @@ height:150px;
 resize:none;
 }
 
-/* AI Chat Button */
+/* Chatbot Button */
 
 .chatbot{
 position:fixed;
@@ -241,10 +241,80 @@ font-size:30px;
 cursor:pointer;
 box-shadow:0 0 20px #00ffff;
 transition:0.3s;
+z-index:1000;
 }
 
 .chatbot:hover{
 transform:scale(1.1);
+}
+
+/* Chat window */
+
+.chat-window{
+position:fixed;
+bottom:120px;
+right:30px;
+width:350px;
+height:500px;
+background:rgba(0,0,0,0.8);
+backdrop-filter:blur(10px);
+border-radius:20px;
+overflow:hidden;
+display:none;
+flex-direction:column;
+box-shadow:0 0 20px rgba(0,255,255,0.5);
+z-index:1000;
+}
+
+.chat-header{
+background:#00ffff;
+color:black;
+padding:15px;
+font-weight:bold;
+text-align:center;
+font-size:20px;
+}
+
+.chat-messages{
+flex:1;
+padding:15px;
+overflow-y:auto;
+display:flex;
+flex-direction:column;
+gap:10px;
+}
+
+.bot-message,
+.user-message{
+padding:12px;
+border-radius:12px;
+max-width:80%;
+}
+
+.bot-message{
+background:rgba(0,255,255,0.2);
+align-self:flex-start;
+}
+
+.user-message{
+background:rgba(255,255,255,0.2);
+align-self:flex-end;
+}
+
+.chat-input{
+display:flex;
+padding:10px;
+gap:10px;
+background:rgba(255,255,255,0.05);
+}
+
+.chat-input input{
+flex:1;
+padding:10px;
+border:none;
+border-radius:10px;
+background:rgba(255,255,255,0.1);
+color:white;
 }
 
 </style>
@@ -274,11 +344,11 @@ transform:scale(1.1);
 
 <h1>Welcome 🚀</h1>
 
-<p>Future Web Developer & Designer</p>
+<p>Future AI Web Developer</p>
 
 <div class="buttons">
 
-<button onclick="alert('Welcome to my website!')">
+<button onclick="alert('Welcome to my futuristic website!')">
 Explore
 </button>
 
@@ -323,13 +393,13 @@ Contact Me
 
 <h2>Contact Me</h2>
 
-<form action="https://formspree.io/f/yourformid" method="POST">
+<form>
 
-<input type="text" placeholder="Tahar" required>
+<input type="text" placeholder="Your Name" required>
 
-<input type="email" placeholder="taharbouguern77@gmail.com" required>
+<input type="email" placeholder="Your Email to contact Tahar" required>
 
-<textarea placeholder="im Tahar jianghan university student"></textarea>
+<textarea placeholder="Your Message to Tahar"></textarea>
 
 <button type="submit">
 Send Message
@@ -339,14 +409,131 @@ Send Message
 
 </section>
 
-<!-- Chatbot -->
+<!-- AI Chatbot -->
 
-<div class="chatbot"
-onclick="alert('AI Chatbot Coming Soon 🤖')">
-
+<div class="chatbot" onclick="toggleChat()">
 🤖
+</div>
+
+<div class="chat-window" id="chatWindow">
+
+<div class="chat-header">
+AI Assistant
+</div>
+
+<div class="chat-messages" id="chatMessages">
+
+<div class="bot-message">
+Hello 👋 How can I help you?
+</div>
 
 </div>
+
+<div class="chat-input">
+
+<input
+type="text"
+id="userInput"
+placeholder="Type a message..."
+>
+
+<button onclick="sendMessage()">
+Send
+</button>
+
+</div>
+
+</div>
+
+<script>
+
+function toggleChat(){
+
+let chat =
+document.getElementById("chatWindow");
+
+if(chat.style.display==="flex"){
+
+chat.style.display="none";
+
+}else{
+
+chat.style.display="flex";
+
+}
+
+}
+
+function sendMessage(){
+
+let input =
+document.getElementById("userInput");
+
+let messages =
+document.getElementById("chatMessages");
+
+let userText = input.value;
+
+if(userText==="") return;
+
+/* User message */
+
+let userMessage =
+document.createElement("div");
+
+userMessage.className =
+"user-message";
+
+userMessage.innerText = userText;
+
+messages.appendChild(userMessage);
+
+/* Bot reply */
+
+let botMessage =
+document.createElement("div");
+
+botMessage.className =
+"bot-message";
+
+/* Fake AI replies */
+
+if(userText.toLowerCase().includes("hello")){
+
+botMessage.innerText =
+"Hello 👋 Nice to meet you!";
+
+}else if(userText.toLowerCase().includes("name")){
+
+botMessage.innerText =
+"My creator is Tahar 🚀";
+
+}else if(userText.toLowerCase().includes("project")){
+
+botMessage.innerText =
+"I can help you explore Tahar's projects.";
+
+}else if(userText.toLowerCase().includes("university")){
+
+botMessage.innerText =
+"Tahar studies at Jianghan University 🎓";
+
+}else{
+
+botMessage.innerText =
+"That's interesting 🚀";
+}
+
+messages.appendChild(botMessage);
+
+input.value="";
+
+messages.scrollTop =
+messages.scrollHeight;
+
+}
+
+</script>
 
 </body>
 </html>
