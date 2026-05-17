@@ -684,8 +684,6 @@ cursor.style.top = e.clientY + "px";
 
 /* CHATBOT */
 
-const API_KEY = "PASTE_YOUR_NEW_API_KEY_HERE";
-
 function toggleChat(){
 
 let chat =
@@ -698,7 +696,125 @@ chat.style.display==="flex"
 
 }
 
-async function sendMessage(){
+function sendMessage(){
+
+let input =
+document.getElementById("userInput");
+
+let messages =
+document.getElementById("chatMessages");
+
+let text = input.value;
+
+if(text === "") return;
+
+let lowerText =
+text.toLowerCase();
+
+let user =
+document.createElement("div");
+
+user.className = "user-message";
+
+user.innerText = text;
+
+messages.appendChild(user);
+
+input.value = "";
+
+let bot =
+document.createElement("div");
+
+bot.className = "bot-message";
+
+/* BOT REPLIES */
+
+if(
+lowerText.includes("hello") ||
+lowerText.includes("hi")
+){
+
+bot.innerText =
+"Hello 👋 Welcome to Tahar Galaxy Website 🚀";
+
+}
+
+else if(
+lowerText.includes("your name")
+){
+
+bot.innerText =
+"I am Tahar AI Assistant 🤖";
+
+}
+
+else if(
+lowerText.includes("tahar")
+){
+
+bot.innerText =
+"Tahar is my creator 🚀";
+
+}
+
+else if(
+lowerText.includes("how are you")
+){
+
+bot.innerText =
+"I am doing amazing 🚀";
+
+}
+
+else if(
+lowerText.includes("project")
+){
+
+bot.innerText =
+"Tahar creates futuristic AI and galaxy web projects 🚀";
+
+}
+
+else if(
+lowerText.includes("website")
+){
+
+bot.innerText =
+"This website was built using HTML, CSS, JavaScript, Three.js and particles.js 🚀";
+
+}
+
+else if(
+lowerText.includes("contact")
+){
+
+bot.innerText =
+"You can contact Tahar through this galaxy website 📩";
+
+}
+
+else if(
+lowerText.includes("bye")
+){
+
+bot.innerText =
+"Goodbye 👋 See you again.";
+
+}
+
+else{
+
+bot.innerText =
+"I am Tahar's futuristic AI assistant 🚀";
+
+}
+
+messages.appendChild(bot);
+
+messages.scrollTop =
+messages.scrollHeight;
+
+}
 
 let input =
 document.getElementById("userInput");
