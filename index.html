@@ -578,8 +578,46 @@ document.createElement("div");
 
 bot.className="bot-message";
 
+if(text.toLowerCase().includes("hello")){
+
 bot.innerText =
-"Galaxy AI Assistant 🚀";
+"Hello 👋 Welcome to Tahar's futuristic galaxy website.";
+
+}else if(text.toLowerCase().includes("name")){
+
+bot.innerText =
+"My creator is Tahar 🚀";
+
+}else if(text.toLowerCase().includes("project")){
+
+bot.innerText =
+"Tahar builds AI websites, galaxy interfaces, and 3D futuristic experiences.";
+
+}else if(text.toLowerCase().includes("university")){
+
+bot.innerText =
+"Tahar studies at Jianghan University 🎓";
+
+}else if(text.toLowerCase().includes("ai")){
+
+bot.innerText =
+"Artificial Intelligence and futuristic web design are Tahar's passions 🤖";
+
+}else if(text.toLowerCase().includes("photo")){
+
+bot.innerText =
+"Yes 🚀 Tahar's real profile image is displayed on this website.";
+
+}else if(text.toLowerCase().includes("game")){
+
+bot.innerText =
+"Tahar is also learning JavaScript game development 🎮";
+
+}else{
+
+bot.innerText =
+"Interesting 🚀 Tell me more.";
+}
 
 messages.appendChild(bot);
 
