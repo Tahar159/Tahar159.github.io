@@ -4,7 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Futuristic AI Website</title>
+<title>Ultra Futuristic Website</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
 <style>
 
@@ -22,36 +24,56 @@ color:white;
 overflow-x:hidden;
 }
 
-/* Animated background */
+/* LOADING SCREEN */
 
-body::before{
-content:"";
+#loader{
 position:fixed;
-width:200%;
-height:200%;
-background:
-radial-gradient(circle,#1a1a40,#050816,#000);
-animation:bgMove 20s infinite linear;
-z-index:-2;
+width:100%;
+height:100%;
+background:black;
+display:flex;
+justify-content:center;
+align-items:center;
+flex-direction:column;
+z-index:9999;
+transition:1s;
 }
 
-@keyframes bgMove{
-
-0%{
-transform:translate(0,0);
+.loader-text{
+font-size:40px;
+color:#00ffff;
+margin-bottom:20px;
+animation:pulse 1s infinite;
 }
 
-50%{
-transform:translate(-10%,-10%);
+.loading-bar{
+width:300px;
+height:10px;
+background:#111;
+border-radius:20px;
+overflow:hidden;
 }
 
-100%{
-transform:translate(0,0);
+.loading-fill{
+width:0%;
+height:100%;
+background:#00ffff;
+animation:loading 3s forwards;
 }
 
+@keyframes loading{
+to{
+width:100%;
+}
 }
 
-/* Navbar */
+@keyframes pulse{
+0%{opacity:0.5;}
+50%{opacity:1;}
+100%{opacity:0.5;}
+}
+
+/* NAVBAR */
 
 nav{
 position:fixed;
@@ -89,7 +111,7 @@ nav a:hover{
 color:#00ffff;
 }
 
-/* Hero section */
+/* HERO */
 
 .hero{
 height:100vh;
@@ -98,7 +120,8 @@ justify-content:center;
 align-items:center;
 flex-direction:column;
 text-align:center;
-padding:20px;
+position:relative;
+overflow:hidden;
 }
 
 .profile{
@@ -110,38 +133,45 @@ border:5px solid #00ffff;
 box-shadow:0 0 30px #00ffff;
 margin-bottom:20px;
 animation:float 3s infinite alternate;
+z-index:2;
 }
 
 @keyframes float{
-
-from{
-transform:translateY(0);
-}
-
-to{
-transform:translateY(-15px);
-}
-
+from{transform:translateY(0);}
+to{transform:translateY(-15px);}
 }
 
 .hero h1{
 font-size:70px;
-margin-bottom:15px;
+margin-bottom:20px;
+z-index:2;
 }
 
-.hero p{
-font-size:24px;
-opacity:0.8;
+.typing{
+font-size:28px;
+color:#00ffff;
+height:40px;
+z-index:2;
 }
 
-/* Buttons */
+/* 3D CANVAS */
+
+#threejs-container{
+position:absolute;
+width:100%;
+height:100%;
+top:0;
+left:0;
+z-index:1;
+}
+
+/* BUTTONS */
 
 .buttons{
 margin-top:30px;
 display:flex;
 gap:20px;
-flex-wrap:wrap;
-justify-content:center;
+z-index:2;
 }
 
 button{
@@ -161,7 +191,7 @@ transform:scale(1.1);
 box-shadow:0 0 20px #00ffff;
 }
 
-/* Cards section */
+/* SECTIONS */
 
 .section{
 padding:100px 50px;
@@ -172,6 +202,8 @@ text-align:center;
 font-size:50px;
 margin-bottom:50px;
 }
+
+/* CARDS */
 
 .cards{
 display:flex;
@@ -200,7 +232,7 @@ margin-bottom:20px;
 font-size:28px;
 }
 
-/* Contact form */
+/* CONTACT */
 
 form{
 max-width:500px;
@@ -224,7 +256,7 @@ height:150px;
 resize:none;
 }
 
-/* Chatbot Button */
+/* CHATBOT */
 
 .chatbot{
 position:fixed;
@@ -240,15 +272,8 @@ align-items:center;
 font-size:30px;
 cursor:pointer;
 box-shadow:0 0 20px #00ffff;
-transition:0.3s;
 z-index:1000;
 }
-
-.chatbot:hover{
-transform:scale(1.1);
-}
-
-/* Chat window */
 
 .chat-window{
 position:fixed;
@@ -256,13 +281,12 @@ bottom:120px;
 right:30px;
 width:350px;
 height:500px;
-background:rgba(0,0,0,0.8);
+background:rgba(0,0,0,0.85);
 backdrop-filter:blur(10px);
 border-radius:20px;
-overflow:hidden;
 display:none;
 flex-direction:column;
-box-shadow:0 0 20px rgba(0,255,255,0.5);
+overflow:hidden;
 z-index:1000;
 }
 
@@ -272,7 +296,6 @@ color:black;
 padding:15px;
 font-weight:bold;
 text-align:center;
-font-size:20px;
 }
 
 .chat-messages{
@@ -284,8 +307,7 @@ flex-direction:column;
 gap:10px;
 }
 
-.bot-message,
-.user-message{
+.bot-message,.user-message{
 padding:12px;
 border-radius:12px;
 max-width:80%;
@@ -305,16 +327,10 @@ align-self:flex-end;
 display:flex;
 padding:10px;
 gap:10px;
-background:rgba(255,255,255,0.05);
 }
 
 .chat-input input{
 flex:1;
-padding:10px;
-border:none;
-border-radius:10px;
-background:rgba(255,255,255,0.1);
-color:white;
 }
 
 </style>
@@ -322,7 +338,21 @@ color:white;
 
 <body>
 
-<!-- Navbar -->
+<!-- LOADER -->
+
+<div id="loader">
+
+<div class="loader-text">
+Loading Future...
+</div>
+
+<div class="loading-bar">
+<div class="loading-fill"></div>
+</div>
+
+</div>
+
+<!-- NAVBAR -->
 
 <nav>
 
@@ -336,31 +366,33 @@ color:white;
 
 </nav>
 
-<!-- Hero -->
+<!-- HERO -->
 
 <section class="hero" id="home">
+
+<div id="threejs-container"></div>
 
 <img src="myphoto.png" class="profile">
 
 <h1>Welcome 🚀</h1>
 
-<p>Future AI Web Developer</p>
+<div class="typing" id="typing"></div>
 
 <div class="buttons">
 
-<button onclick="alert('Welcome to my futuristic website!')">
+<button onclick="alert('Welcome to the future 🚀')">
 Explore
 </button>
 
 <button onclick="window.scrollTo(0,document.body.scrollHeight)">
-Contact Me
+Contact
 </button>
 
 </div>
 
 </section>
 
-<!-- Projects -->
+<!-- PROJECTS -->
 
 <section class="section" id="projects">
 
@@ -370,24 +402,24 @@ Contact Me
 
 <div class="card">
 <h3>AI Website</h3>
-<p>Modern futuristic AI website project.</p>
+<p>Modern futuristic AI projects.</p>
 </div>
 
 <div class="card">
-<h3>3D Animation</h3>
-<p>Interactive 3D animation effects project.</p>
+<h3>3D Environment</h3>
+<p>Three.js futuristic animations.</p>
 </div>
 
 <div class="card">
-<h3>Game Project</h3>
-<p>JavaScript mini game development.</p>
+<h3>Game Development</h3>
+<p>Interactive JavaScript mini games.</p>
 </div>
 
 </div>
 
 </section>
 
-<!-- Contact -->
+<!-- CONTACT -->
 
 <section class="section" id="contact">
 
@@ -395,9 +427,9 @@ Contact Me
 
 <form>
 
-<input type="text" placeholder="Your Name" required>
+<input type="text" placeholder="Your Name">
 
-<input type="email" placeholder="Your Email to contact Tahar" required>
+<input type="email" placeholder="Your Email to Tahar">
 
 <textarea placeholder="Your Message to Tahar"></textarea>
 
@@ -409,7 +441,7 @@ Send Message
 
 </section>
 
-<!-- AI Chatbot -->
+<!-- CHATBOT -->
 
 <div class="chatbot" onclick="toggleChat()">
 🤖
@@ -431,11 +463,7 @@ Hello 👋 How can I help you?
 
 <div class="chat-input">
 
-<input
-type="text"
-id="userInput"
-placeholder="Type a message..."
->
+<input type="text" id="userInput" placeholder="Type here...">
 
 <button onclick="sendMessage()">
 Send
@@ -447,20 +475,58 @@ Send
 
 <script>
 
+/* LOADER */
+
+window.onload = function(){
+
+setTimeout(()=>{
+
+document.getElementById("loader").style.opacity="0";
+
+setTimeout(()=>{
+
+document.getElementById("loader").style.display="none";
+
+},1000);
+
+},3000);
+
+};
+
+/* TYPING EFFECT */
+
+const text =
+"Future AI Web Developer 🚀";
+
+let i = 0;
+
+function typing(){
+
+if(i < text.length){
+
+document.getElementById("typing").innerHTML += text.charAt(i);
+
+i++;
+
+setTimeout(typing,100);
+
+}
+
+}
+
+typing();
+
+/* CHATBOT */
+
 function toggleChat(){
 
 let chat =
 document.getElementById("chatWindow");
 
-if(chat.style.display==="flex"){
-
-chat.style.display="none";
-
-}else{
-
-chat.style.display="flex";
-
-}
+chat.style.display =
+chat.style.display==="flex"
+? "none"
+: "flex";
 
 }
 
@@ -472,59 +538,41 @@ document.getElementById("userInput");
 let messages =
 document.getElementById("chatMessages");
 
-let userText = input.value;
+let text = input.value;
 
-if(userText==="") return;
+if(text==="") return;
 
-/* User message */
-
-let userMessage =
+let user =
 document.createElement("div");
 
-userMessage.className =
-"user-message";
+user.className="user-message";
 
-userMessage.innerText = userText;
+user.innerText=text;
 
-messages.appendChild(userMessage);
+messages.appendChild(user);
 
-/* Bot reply */
-
-let botMessage =
+let bot =
 document.createElement("div");
 
-botMessage.className =
-"bot-message";
+bot.className="bot-message";
 
-/* Fake AI replies */
+if(text.toLowerCase().includes("hello")){
 
-if(userText.toLowerCase().includes("hello")){
+bot.innerText =
+"Hello 👋 Welcome to Tahar's futuristic website.";
 
-botMessage.innerText =
-"Hello 👋 Nice to meet you!";
+}else if(text.toLowerCase().includes("project")){
 
-}else if(userText.toLowerCase().includes("name")){
-
-botMessage.innerText =
-"My creator is Tahar 🚀";
-
-}else if(userText.toLowerCase().includes("project")){
-
-botMessage.innerText =
-"I can help you explore Tahar's projects.";
-
-}else if(userText.toLowerCase().includes("university")){
-
-botMessage.innerText =
-"Tahar studies at Jianghan University 🎓";
+bot.innerText =
+"Tahar creates AI and 3D web projects 🚀";
 
 }else{
 
-botMessage.innerText =
-"That's interesting 🚀";
+bot.innerText =
+"Interesting 🚀";
 }
 
-messages.appendChild(botMessage);
+messages.appendChild(bot);
 
 input.value="";
 
@@ -532,6 +580,61 @@ messages.scrollTop =
 messages.scrollHeight;
 
 }
+
+/* THREE.JS */
+
+const scene = new THREE.Scene();
+
+const camera =
+new THREE.PerspectiveCamera(
+75,
+window.innerWidth/window.innerHeight,
+0.1,
+1000
+);
+
+const renderer =
+new THREE.WebGLRenderer({
+alpha:true
+});
+
+renderer.setSize(
+window.innerWidth,
+window.innerHeight
+);
+
+document
+.getElementById("threejs-container")
+.appendChild(renderer.domElement);
+
+const geometry =
+new THREE.SphereGeometry(2,32,32);
+
+const material =
+new THREE.MeshBasicMaterial({
+color:0x00ffff,
+wireframe:true
+});
+
+const sphere =
+new THREE.Mesh(geometry,material);
+
+scene.add(sphere);
+
+camera.position.z = 5;
+
+function animate(){
+
+requestAnimationFrame(animate);
+
+sphere.rotation.x += 0.01;
+sphere.rotation.y += 0.01;
+
+renderer.render(scene,camera);
+
+}
+
+animate();
 
 </script>
 
