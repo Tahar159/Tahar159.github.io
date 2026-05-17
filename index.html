@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Modern Website</title>
+<title>Futuristic Website</title>
 
 <style>
 
@@ -12,65 +12,86 @@
 margin:0;
 padding:0;
 box-sizing:border-box;
+scroll-behavior:smooth;
 font-family:Arial;
 }
 
 body{
-height:100vh;
-overflow:hidden;
-background:black;
+background:#050816;
 color:white;
+overflow-x:hidden;
 }
 
-/* Moving animated background */
+/* Animated background */
 
-.background{
-position:absolute;
-width:100%;
-height:100%;
+body::before{
+content:"";
+position:fixed;
+width:200%;
+height:200%;
 background:
-linear-gradient(45deg,#0f0c29,#302b63,#24243e);
-background-size:400% 400%;
-animation:bgMove 10s infinite alternate;
+radial-gradient(circle,#1a1a40,#050816,#000);
+animation:bgMove 20s infinite linear;
 z-index:-2;
 }
 
 @keyframes bgMove{
 
 0%{
-background-position:left;
+transform:translate(0,0);
+}
+
+50%{
+transform:translate(-10%,-10%);
 }
 
 100%{
-background-position:right;
+transform:translate(0,0);
 }
 
 }
 
-/* Floating circles */
+/* Navbar */
 
-.circle{
-position:absolute;
-border-radius:50%;
-background:rgba(255,255,255,0.1);
-animation:float 10s infinite linear;
+nav{
+position:fixed;
+top:0;
+width:100%;
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:20px 50px;
+background:rgba(0,0,0,0.3);
+backdrop-filter:blur(10px);
+z-index:1000;
 }
 
-@keyframes float{
-
-0%{
-transform:translateY(100vh);
+.logo{
+font-size:28px;
+font-weight:bold;
+color:#00ffff;
 }
 
-100%{
-transform:translateY(-120vh);
+nav ul{
+display:flex;
+list-style:none;
+gap:30px;
 }
 
+nav a{
+text-decoration:none;
+color:white;
+font-size:18px;
+transition:0.3s;
 }
 
-/* Main content */
+nav a:hover{
+color:#00ffff;
+}
 
-.container{
+/* Hero section */
+
+.hero{
 height:100vh;
 display:flex;
 justify-content:center;
@@ -80,45 +101,43 @@ text-align:center;
 padding:20px;
 }
 
-/* Profile image */
-
 .profile{
 width:180px;
 height:180px;
 border-radius:50%;
 object-fit:cover;
-border:5px solid white;
-box-shadow:0 0 30px rgba(255,255,255,0.5);
+border:5px solid #00ffff;
+box-shadow:0 0 30px #00ffff;
 margin-bottom:20px;
-animation:zoom 3s infinite alternate;
+animation:float 3s infinite alternate;
 }
 
-@keyframes zoom{
+@keyframes float{
 
 from{
-transform:scale(1);
+transform:translateY(0);
 }
 
 to{
-transform:scale(1.05);
+transform:translateY(-15px);
 }
 
 }
 
-h1{
-font-size:60px;
-margin-bottom:10px;
+.hero h1{
+font-size:70px;
+margin-bottom:15px;
 }
 
-p{
-font-size:22px;
+.hero p{
+font-size:24px;
 opacity:0.8;
-margin-bottom:30px;
 }
 
 /* Buttons */
 
 .buttons{
+margin-top:30px;
 display:flex;
 gap:20px;
 flex-wrap:wrap;
@@ -129,34 +148,103 @@ button{
 padding:15px 35px;
 border:none;
 border-radius:30px;
+background:#00ffff;
+color:black;
 font-size:18px;
 cursor:pointer;
 transition:0.3s;
-background:white;
-color:black;
 font-weight:bold;
 }
 
 button:hover{
-transform:translateY(-5px) scale(1.05);
-box-shadow:0 10px 20px rgba(255,255,255,0.3);
+transform:scale(1.1);
+box-shadow:0 0 20px #00ffff;
 }
 
-/* Glass card */
+/* Cards section */
+
+.section{
+padding:100px 50px;
+text-align:center;
+}
+
+.section h2{
+font-size:50px;
+margin-bottom:50px;
+}
+
+.cards{
+display:flex;
+justify-content:center;
+gap:30px;
+flex-wrap:wrap;
+}
 
 .card{
-margin-top:40px;
 width:300px;
-padding:25px;
+padding:30px;
 border-radius:20px;
-background:rgba(255,255,255,0.1);
+background:rgba(255,255,255,0.08);
 backdrop-filter:blur(10px);
-box-shadow:0 8px 32px rgba(0,0,0,0.3);
-transition:0.4s;
+transition:0.5s;
+transform-style:preserve-3d;
 }
 
 .card:hover{
-transform:rotateY(10deg) rotateX(10deg);
+transform:rotateY(15deg) rotateX(10deg) scale(1.05);
+box-shadow:0 0 30px rgba(0,255,255,0.5);
+}
+
+.card h3{
+margin-bottom:20px;
+font-size:28px;
+}
+
+/* Contact form */
+
+form{
+max-width:500px;
+margin:auto;
+display:flex;
+flex-direction:column;
+gap:20px;
+}
+
+input,textarea{
+padding:15px;
+border:none;
+border-radius:10px;
+background:rgba(255,255,255,0.1);
+color:white;
+font-size:16px;
+}
+
+textarea{
+height:150px;
+resize:none;
+}
+
+/* AI Chat Button */
+
+.chatbot{
+position:fixed;
+bottom:30px;
+right:30px;
+width:70px;
+height:70px;
+border-radius:50%;
+background:#00ffff;
+display:flex;
+justify-content:center;
+align-items:center;
+font-size:30px;
+cursor:pointer;
+box-shadow:0 0 20px #00ffff;
+transition:0.3s;
+}
+
+.chatbot:hover{
+transform:scale(1.1);
 }
 
 </style>
@@ -164,65 +252,101 @@ transform:rotateY(10deg) rotateX(10deg);
 
 <body>
 
-<div class="background"></div>
+<!-- Navbar -->
 
-<div class="container">
+<nav>
+
+<div class="logo">TAHAR</div>
+
+<ul>
+<li><a href="#home">Home</a></li>
+<li><a href="#projects">Projects</a></li>
+<li><a href="#contact">Contact</a></li>
+</ul>
+
+</nav>
+
+<!-- Hero -->
+
+<section class="hero" id="home">
 
 <img src="myphoto.png" class="profile">
 
 <h1>Welcome 🚀</h1>
 
-<p>My futuristic website 🚀</p>
+<p>Future Web Developer & Designer</p>
 
 <div class="buttons">
 
-<button onclick="alert('Welcome!')">
-Enter
+<button onclick="alert('Welcome to my website!')">
+Explore
 </button>
 
-<button onclick="window.location.reload()">
-Refresh
+<button onclick="window.scrollTo(0,document.body.scrollHeight)">
+Contact Me
 </button>
 
+</div>
+
+</section>
+
+<!-- Projects -->
+
+<section class="section" id="projects">
+
+<h2>My Projects</h2>
+
+<div class="cards">
+
+<div class="card">
+<h3>AI Website</h3>
+<p>Modern futuristic AI website project.</p>
 </div>
 
 <div class="card">
+<h3>3D Animation</h3>
+<p>Interactive 3D animation effects project.</p>
+</div>
 
-<h2>About Me</h2>
-
-<p>
-I am learning web development and creating amazing futuristic websites.
-</p>
-
+<div class="card">
+<h3>Game Project</h3>
+<p>JavaScript mini game development.</p>
 </div>
 
 </div>
 
-<script>
+</section>
 
-/* Create floating circles */
+<!-- Contact -->
 
-for(let i=0;i<30;i++){
+<section class="section" id="contact">
 
-let circle=document.createElement("div");
+<h2>Contact Me</h2>
 
-circle.classList.add("circle");
+<form action="https://formspree.io/f/yourformid" method="POST">
 
-let size=Math.random()*80;
+<input type="text" placeholder="Tahar" required>
 
-circle.style.width=size+"px";
-circle.style.height=size+"px";
+<input type="email" placeholder="taharbouguern77@gmail.com" required>
 
-circle.style.left=Math.random()*100+"vw";
+<textarea placeholder="im Tahar jianghan university student"></textarea>
 
-circle.style.animationDuration=
-(5+Math.random()*10)+"s";
+<button type="submit">
+Send Message
+</button>
 
-document.body.appendChild(circle);
+</form>
 
-}
+</section>
 
-</script>
+<!-- Chatbot -->
+
+<div class="chatbot"
+onclick="alert('AI Chatbot Coming Soon 🤖')">
+
+🤖
+
+</div>
 
 </body>
 </html>
