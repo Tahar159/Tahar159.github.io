@@ -613,8 +613,19 @@ text: text
 
 const data = await response.json();
 
+console.log(data);
+
+if(data.candidates){
+
 bot.innerText =
 data.candidates[0].content.parts[0].text;
+
+}else{
+
+bot.innerText =
+JSON.stringify(data);
+
+}
 
 }catch(error){
 
