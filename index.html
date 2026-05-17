@@ -28,6 +28,29 @@ background:#050816;
 color:white;
 overflow-x:hidden;
 position:relative;
+transition:1s;
+}
+
+/* AUTO DAY/NIGHT */
+
+body.day-mode{
+background:#dfefff;
+color:black;
+}
+
+body.day-mode nav{
+background:rgba(255,255,255,0.4);
+}
+
+body.day-mode .card{
+background:rgba(255,255,255,0.5);
+color:black;
+}
+
+body.day-mode input,
+body.day-mode textarea{
+background:rgba(255,255,255,0.7);
+color:black;
 }
 
 /* PARTICLES */
@@ -38,8 +61,19 @@ width:100%;
 height:100%;
 top:0;
 left:0;
+z-index:-6;
+}
+
+/* MATRIX */
+
+#matrix{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
 z-index:-5;
-background:#050816;
+opacity:0.15;
 }
 
 /* STARS */
@@ -151,6 +185,31 @@ nav a:hover{
 color:#00ffff;
 }
 
+/* CLOCK */
+
+.clock{
+position:fixed;
+top:100px;
+right:20px;
+background:rgba(0,0,0,0.4);
+padding:15px 20px;
+border-radius:15px;
+backdrop-filter:blur(10px);
+z-index:1000;
+box-shadow:0 0 20px rgba(0,255,255,0.4);
+}
+
+#time{
+font-size:22px;
+color:#00ffff;
+font-weight:bold;
+}
+
+#date{
+font-size:14px;
+margin-top:5px;
+}
+
 /* HERO */
 
 .hero{
@@ -213,7 +272,7 @@ z-index:2;
 text-shadow:0 0 10px #00ffff;
 }
 
-/* THREE */
+/* 3D GALAXY */
 
 #threejs-container{
 position:absolute;
@@ -248,6 +307,24 @@ font-weight:bold;
 button:hover{
 transform:scale(1.1);
 box-shadow:0 0 25px #00ffff;
+}
+
+/* FLOATING ICONS */
+
+.floating-icons span{
+position:absolute;
+font-size:35px;
+animation:floatIcons 10s linear infinite;
+opacity:0.7;
+}
+
+@keyframes floatIcons{
+0%{
+transform:translateY(100vh) rotate(0deg);
+}
+100%{
+transform:translateY(-120vh) rotate(360deg);
+}
 }
 
 /* SECTIONS */
@@ -303,6 +380,44 @@ box-shadow:0 0 35px rgba(0,255,255,0.5);
 margin-bottom:20px;
 font-size:28px;
 color:#00ffff;
+}
+
+/* SKILLS */
+
+.skills{
+max-width:700px;
+margin:auto;
+text-align:left;
+}
+
+.skill{
+margin-bottom:25px;
+}
+
+.skill h3{
+margin-bottom:10px;
+}
+
+.progress{
+width:100%;
+height:25px;
+background:rgba(255,255,255,0.1);
+border-radius:20px;
+overflow:hidden;
+}
+
+.progress-bar{
+height:100%;
+background:#00ffff;
+width:0%;
+border-radius:20px;
+animation:loadSkill 3s forwards;
+}
+
+@keyframes loadSkill{
+from{
+width:0%;
+}
 }
 
 /* CONTACT */
@@ -428,7 +543,7 @@ gap:10px;
 flex:1;
 }
 
-/* CUSTOM CURSOR */
+/* CURSOR */
 
 .cursor{
 width:20px;
@@ -471,6 +586,11 @@ width:90%;
 right:5%;
 }
 
+.clock{
+top:90px;
+right:10px;
+}
+
 }
 
 </style>
@@ -478,11 +598,30 @@ right:5%;
 
 <body>
 
+<canvas id="matrix"></canvas>
+
 <div class="stars"></div>
 
 <div id="particles-js"></div>
 
 <div class="cursor" id="cursor"></div>
+
+<!-- FLOATING ICONS -->
+
+<div class="floating-icons">
+<span style="left:10%; animation-delay:0s;">🚀</span>
+<span style="left:30%; animation-delay:2s;">🌌</span>
+<span style="left:50%; animation-delay:4s;">✨</span>
+<span style="left:70%; animation-delay:1s;">🪐</span>
+<span style="left:90%; animation-delay:3s;">💻</span>
+</div>
+
+<!-- CLOCK -->
+
+<div class="clock">
+<div id="time"></div>
+<div id="date"></div>
+</div>
 
 <!-- LOADER -->
 
@@ -507,6 +646,7 @@ Welcome To Tahar Galaxy 🚀
 <ul>
 <li><a href="#home">Home</a></li>
 <li><a href="#projects">Projects</a></li>
+<li><a href="#skills">Skills</a></li>
 <li><a href="#contact">Contact</a></li>
 </ul>
 
@@ -526,7 +666,7 @@ Welcome To Tahar Galaxy 🚀
 
 <div class="buttons">
 
-<button onclick="alert('Welcome To Tahar website 🚀...')">
+<button onclick="alert('Welcome To Tahar Website 🚀')">
 Explore
 </button>
 
@@ -548,17 +688,57 @@ Contact
 
 <div class="card">
 <h3>AI Website</h3>
-<p>Modern futuristic AI projects with Gemini integration.</p>
+<p>Modern futuristic AI projects.</p>
 </div>
 
 <div class="card">
 <h3>3D Environment</h3>
-<p>Advanced Three.js galaxy animations and interactions.</p>
+<p>Advanced galaxy animations and interactions.</p>
 </div>
 
 <div class="card">
 <h3>Game Development</h3>
-<p>Interactive JavaScript games and futuristic interfaces.</p>
+<p>Interactive futuristic JavaScript games.</p>
+</div>
+
+</div>
+
+</section>
+
+<!-- SKILLS -->
+
+<section class="section" id="skills">
+
+<h2>My Skills ⚡</h2>
+
+<div class="skills">
+
+<div class="skill">
+<h3>HTML</h3>
+<div class="progress">
+<div class="progress-bar" style="width:95%;"></div>
+</div>
+</div>
+
+<div class="skill">
+<h3>CSS</h3>
+<div class="progress">
+<div class="progress-bar" style="width:90%;"></div>
+</div>
+</div>
+
+<div class="skill">
+<h3>JavaScript</h3>
+<div class="progress">
+<div class="progress-bar" style="width:85%;"></div>
+</div>
+</div>
+
+<div class="skill">
+<h3>Three.js</h3>
+<div class="progress">
+<div class="progress-bar" style="width:80%;"></div>
+</div>
 </div>
 
 </div>
@@ -629,6 +809,14 @@ Send
 
 <script>
 
+/* AUTO DAY NIGHT */
+
+const hour = new Date().getHours();
+
+if(hour >= 6 && hour < 18){
+document.body.classList.add("day-mode");
+}
+
 /* LOADER */
 
 window.onload = function(){
@@ -669,6 +857,24 @@ setTimeout(typing,100);
 }
 
 typing();
+
+/* CLOCK */
+
+function updateClock(){
+
+const now = new Date();
+
+document.getElementById("time").innerHTML =
+now.toLocaleTimeString();
+
+document.getElementById("date").innerHTML =
+now.toDateString();
+
+}
+
+setInterval(updateClock,1000);
+
+updateClock();
 
 /* CURSOR */
 
@@ -727,15 +933,13 @@ document.createElement("div");
 
 bot.className = "bot-message";
 
-/* BOT REPLIES */
-
 if(
 lowerText.includes("hello") ||
 lowerText.includes("hi")
 ){
 
 bot.innerText =
-"Hello 👋 Welcome to Tahar Galaxy Website 🚀";
+"Hello 👋 Welcome to Tahar Galaxy 🚀";
 
 }
 
@@ -758,54 +962,18 @@ bot.innerText =
 }
 
 else if(
-lowerText.includes("how are you")
-){
-
-bot.innerText =
-"I am doing amazing 🚀";
-
-}
-
-else if(
 lowerText.includes("project")
 ){
 
 bot.innerText =
-"Tahar creates futuristic AI and galaxy web projects 🚀";
-
-}
-
-else if(
-lowerText.includes("website")
-){
-
-bot.innerText =
-"This website was built using HTML, CSS, JavaScript, Three.js and particles.js 🚀";
-
-}
-
-else if(
-lowerText.includes("contact")
-){
-
-bot.innerText =
-"You can contact Tahar through this galaxy website 📩";
-
-}
-
-else if(
-lowerText.includes("bye")
-){
-
-bot.innerText =
-"Goodbye 👋 See you again.";
+"Tahar creates futuristic galaxy projects 🚀";
 
 }
 
 else{
 
 bot.innerText =
-"I am Tahar's futuristic AI assistant 🚀";
+"I am Tahar futuristic assistant 🚀";
 
 }
 
@@ -816,8 +984,7 @@ messages.scrollHeight;
 
 }
 
-
-/* THREE.JS */
+/* REAL 3D GALAXY */
 
 const scene = new THREE.Scene();
 
@@ -843,19 +1010,44 @@ document
 .getElementById("threejs-container")
 .appendChild(renderer.domElement);
 
-const geometry =
-new THREE.SphereGeometry(2,32,32);
+const starsGeometry =
+new THREE.BufferGeometry();
 
-const material =
-new THREE.MeshBasicMaterial({
-color:0x00ffff,
-wireframe:true
+const starsMaterial =
+new THREE.PointsMaterial({
+color:0xffffff,
+size:0.05
 });
 
-const sphere =
-new THREE.Mesh(geometry,material);
+const starsVertices = [];
 
-scene.add(sphere);
+for(let i=0;i<10000;i++){
+
+const x =
+( Math.random() - 0.5 ) * 2000;
+
+const y =
+( Math.random() - 0.5 ) * 2000;
+
+const z =
+- Math.random() * 2000;
+
+starsVertices.push(x,y,z);
+
+}
+
+starsGeometry.setAttribute(
+'position',
+new THREE.Float32BufferAttribute(starsVertices,3)
+);
+
+const starField =
+new THREE.Points(
+starsGeometry,
+starsMaterial
+);
+
+scene.add(starField);
 
 camera.position.z = 5;
 
@@ -863,14 +1055,90 @@ function animate(){
 
 requestAnimationFrame(animate);
 
-sphere.rotation.x += 0.01;
-sphere.rotation.y += 0.01;
+starField.rotation.y += 0.0005;
 
 renderer.render(scene,camera);
 
 }
 
 animate();
+
+/* MATRIX RAIN */
+
+const canvas =
+document.getElementById("matrix");
+
+const ctx =
+canvas.getContext("2d");
+
+canvas.width =
+window.innerWidth;
+
+canvas.height =
+window.innerHeight;
+
+const letters =
+"01ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+const matrix =
+letters.split("");
+
+const fontSize = 14;
+
+const columns =
+canvas.width/fontSize;
+
+const drops = [];
+
+for(let x = 0; x < columns; x++){
+drops[x] = 1;
+}
+
+function drawMatrix(){
+
+ctx.fillStyle =
+"rgba(0,0,0,0.05)";
+
+ctx.fillRect(
+0,
+0,
+canvas.width,
+canvas.height
+);
+
+ctx.fillStyle =
+"#00ff00";
+
+ctx.font =
+fontSize + "px monospace";
+
+for(let i = 0; i < drops.length; i++){
+
+const text =
+matrix[
+Math.floor(Math.random()*matrix.length)
+];
+
+ctx.fillText(
+text,
+i*fontSize,
+drops[i]*fontSize
+);
+
+if(
+drops[i]*fontSize > canvas.height &&
+Math.random() > 0.975
+){
+drops[i] = 0;
+}
+
+drops[i]++;
+
+}
+
+}
+
+setInterval(drawMatrix,35);
 
 /* PARTICLES */
 
@@ -879,11 +1147,7 @@ particlesJS("particles-js", {
 particles:{
 
 number:{
-value:120,
-density:{
-enable:true,
-value_area:800
-}
+value:100
 },
 
 color:{
@@ -895,13 +1159,11 @@ type:"circle"
 },
 
 opacity:{
-value:0.5,
-random:true
+value:0.5
 },
 
 size:{
-value:3,
-random:true
+value:3
 },
 
 line_linked:{
@@ -921,35 +1183,11 @@ speed:2
 
 interactivity:{
 
-detect_on:"canvas",
-
 events:{
 
 onhover:{
 enable:true,
 mode:"grab"
-},
-
-onclick:{
-enable:true,
-mode:"push"
-},
-
-resize:true
-
-},
-
-modes:{
-
-grab:{
-distance:200,
-line_linked:{
-opacity:0.5
-}
-},
-
-push:{
-particles_nb:5
 }
 
 }
@@ -960,7 +1198,7 @@ retina_detect:true
 
 });
 
-/* SCROLL ANIMATION */
+/* SCROLL */
 
 const sections =
 document.querySelectorAll(".section");
