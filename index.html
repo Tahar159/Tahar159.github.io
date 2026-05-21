@@ -902,7 +902,9 @@ chat.style.display==="flex"
 
 }
 
-function sendMessage(){
+/* REAL AI CHATBOT WITH QWEN */
+
+async function sendMessage(){
 
 let input =
 document.getElementById("userInput");
@@ -914,8 +916,7 @@ let text = input.value;
 
 if(text === "") return;
 
-let lowerText =
-text.toLowerCase();
+/* USER MESSAGE */
 
 let user =
 document.createElement("div");
@@ -926,58 +927,79 @@ user.innerText = text;
 
 messages.appendChild(user);
 
+messages.scrollTop =
+messages.scrollHeight;
+
 input.value = "";
+
+/* BOT LOADING */
 
 let bot =
 document.createElement("div");
 
 bot.className = "bot-message";
 
-if(
-lowerText.includes("hello") ||
-lowerText.includes("hi")
-){
-
-bot.innerText =
-"Hello 👋 Welcome to Tahar Galaxy 🚀";
-
-}
-
-else if(
-lowerText.includes("your name")
-){
-
-bot.innerText =
-"I am Tahar AI Assistant 🤖";
-
-}
-
-else if(
-lowerText.includes("tahar")
-){
-
-bot.innerText =
-"Tahar is my creator 🚀";
-
-}
-
-else if(
-lowerText.includes("project")
-){
-
-bot.innerText =
-"Tahar creates futuristic galaxy projects 🚀";
-
-}
-
-else{
-
-bot.innerText =
-"I am Tahar futuristic assistant 🚀";
-
-}
+bot.innerText = "Typing...";
 
 messages.appendChild(bot);
+
+messages.scrollTop =
+messages.scrollHeight;
+
+try{
+
+const response = await fetch(
+"https://dashscope-intl.aliyuncs.com/compatible-mode/v1/chat/completions",
+{
+method:"POST",
+
+headers:{
+"Content-Type":"application/json",
+
+"Authorization":
+"Bearer sk-5f9b5c7984ba4e8eab2db451c8c26923"
+},
+
+body:JSON.stringify({
+
+model:"qwen-plus",
+
+messages:[
+
+{
+role:"system",
+
+content:
+"You are Tahar futuristic AI assistant. Reply in a cool futuristic style."
+},
+
+{
+role:"user",
+content:text
+}
+
+]
+
+})
+
+}
+);
+
+const data =
+await response.json();
+
+bot.innerText =
+data.choices[0].message.content;
+
+}
+catch(error){
+
+bot.innerText =
+"Error connecting to AI 🚨";
+
+console.log(error);
+
+}
 
 messages.scrollTop =
 messages.scrollHeight;
