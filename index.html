@@ -985,8 +985,11 @@ content:text
 }
 );
 
+console.log(response.status);
+
 const data = await response.json();
 
+console.log(data);
 if(data.choices && data.choices.length > 0){
 
 bot.innerText =
