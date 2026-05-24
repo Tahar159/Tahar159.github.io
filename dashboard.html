@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<title>AI Dashboard</title>
+
+<style>
+
+body{
+margin:0;
+background:black;
+font-family:Arial;
+color:#00ffff;
+overflow:hidden;
+}
+
+.container{
+padding:50px;
+}
+
+h1{
+font-size:60px;
+text-shadow:0 0 20px #00ffff;
+}
+
+.panel{
+background:rgba(0,255,255,0.1);
+padding:30px;
+margin-top:30px;
+border-radius:20px;
+box-shadow:0 0 20px #00ffff;
+font-size:25px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>AI DASHBOARD 🧠</h1>
+
+<div class="panel">
+AI STATUS: ONLINE ✅
+</div>
+
+<div class="panel">
+SYSTEM POWER: 98%
+</div>
+
+<div class="panel">
+NEURAL NETWORK: ACTIVE
+</div>
+
+<div class="panel" id="clock">
+Loading Time...
+</div>
+
+</div>
+
+<script>
+
+function updateClock(){
+
+const now = new Date();
+
+document.getElementById("clock").innerHTML =
+"TIME: " + now.toLocaleTimeString();
+
+}
+
+setInterval(updateClock,1000);
+
+updateClock();
+
+</script>
+
+</body>
+
+</html>
