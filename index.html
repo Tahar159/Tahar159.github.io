@@ -949,7 +949,7 @@ messages.scrollHeight;
 try{
 
 const response = await fetch(
-"https://dashscope-intl.aliyuncs.com/compatible-mode/v1/chat/completions",
+"https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions",
 {
 method:"POST",
 
@@ -957,7 +957,7 @@ headers:{
 "Content-Type":"application/json",
 
 "Authorization":
-"Bearer sk-d5076a7f242b407599b3253b42d9c112"
+"Bearer sk-c31927ba9ecd492d99830c199d06a5ec"
 },
 
 body:JSON.stringify({
@@ -988,6 +988,8 @@ content:text
 console.log(response.status);
 
 const data = await response.json();
+
+console.log(data);
 
 console.log(data);
 if(data.choices && data.choices.length > 0){
