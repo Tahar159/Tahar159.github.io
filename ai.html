@@ -51,6 +51,21 @@ to{
 transform:translateY(-15px);
 }
 }
+@keyframes talk{
+
+0%{
+transform:scale(1);
+}
+
+50%{
+transform:scale(1.12);
+}
+
+100%{
+transform:scale(1);
+}
+
+}  
 .cards{
 display:flex;
 justify-content:center;
@@ -212,19 +227,19 @@ speech.lang = "en-US";
 speech.rate = 1;
 
 speech.pitch = 1;
-
-speechSynthesis.speak(speech);
-  const avatar =
+const avatar =
 document.getElementById("avatar");
 
-avatar.style.transform = "scale(1.1)";
+avatar.style.animation =
+"talk 0.4s infinite";
+speechSynthesis.speak(speech);
+speech.onend = function(){
 
-setTimeout(()=>{
+avatar.style.animation =
+"float 3s infinite alternate";
 
-avatar.style.transform = "scale(1)";
-
-},2000);
-
+};  
+  
 }
 catch(error){
 
