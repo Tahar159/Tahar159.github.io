@@ -236,7 +236,6 @@ console.log(error);
 }
 
 }
-function startVoice(){
   document
 .getElementById("prompt")
 .addEventListener("keypress",function(e){
@@ -248,7 +247,8 @@ askAI();
 }
 
 });
-
+function startVoice(){
+ 
 const recognition =
 new webkitSpeechRecognition();
 
