@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>AI Center</title>
+
+<style>
+
+body{
+margin:0;
+font-family:Arial;
+background:#050816;
+color:white;
+overflow-x:hidden;
+}
+
+canvas{
+position:fixed;
+top:0;
+left:0;
+z-index:-1;
+}
+
+.container{
+padding:50px;
+text-align:center;
+}
+
+h1{
+font-size:70px;
+color:#00ffff;
+text-shadow:0 0 20px #00ffff;
+}
+
+.cards{
+display:flex;
+justify-content:center;
+gap:30px;
+flex-wrap:wrap;
+margin-top:50px;
+}
+
+.card{
+width:300px;
+padding:30px;
+background:rgba(255,255,255,0.05);
+border-radius:20px;
+backdrop-filter:blur(10px);
+transition:0.4s;
+cursor:pointer;
+}
+
+.card:hover{
+transform:scale(1.05);
+box-shadow:0 0 30px #00ffff;
+}
+
+.card h2{
+color:#00ffff;
+}
+
+.chat{
+margin-top:80px;
+max-width:700px;
+margin-left:auto;
+margin-right:auto;
+}
+
+input{
+width:70%;
+padding:15px;
+border:none;
+border-radius:10px;
+font-size:18px;
+}
+
+button{
+padding:15px 25px;
+border:none;
+border-radius:10px;
+background:#00ffff;
+font-weight:bold;
+cursor:pointer;
+}
+
+#response{
+margin-top:30px;
+padding:20px;
+background:rgba(255,255,255,0.05);
+border-radius:15px;
+min-height:100px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>AI CENTER 🚀</h1>
+
+<div class="cards">
+
+<div class="card">
+<h2>AI Chatbot</h2>
+<p>Advanced futuristic AI assistant.</p>
+</div>
+
+<div class="card">
+<h2>AI Generator</h2>
+<p>Create futuristic ideas and concepts.</p>
+</div>
+
+<div class="card">
+<h2>AI Dashboard</h2>
+<p>Real-time hologram system.</p>
+</div>
+
+</div>
+
+<div class="chat">
+
+<h2>Talk To AI</h2>
+
+<input type="text" id="prompt" placeholder="Ask AI anything...">
+
+<button onclick="askAI()">Send</button>
+
+<div id="response"></div>
+
+</div>
+
+</div>
+
+<script>
+
+async function askAI(){
+
+const prompt =
+document.getElementById("prompt").value;
+
+const responseBox =
+document.getElementById("response");
+
+responseBox.innerHTML = "Thinking...";
+
+try{
+
+const response = await fetch(
+"https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions",
+{
+method:"POST",
+
+headers:{
+"Content-Type":"application/json",
+"Authorization":"Bearer sk-c31927ba9ecd492d99830c199d06a5ec"
+},
+
+body:JSON.stringify({
+
+model:"qwen-plus",
+
+messages:[
+{
+role:"user",
+content:prompt
+}
+]
+
+})
+
+}
+);
+
+const data = await response.json();
+
+responseBox.innerHTML =
+data.choices[0].message.content;
+
+}
+catch(error){
+
+responseBox.innerHTML =
+"AI Error 🚨";
+
+console.log(error);
+
+}
+
+}
+
+</script>
+
+</body>
+</html>
