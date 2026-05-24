@@ -33,6 +33,8 @@ font-size:70px;
 color:#00ffff;
 text-shadow:0 0 20px #00ffff;
 }
+
+/* AVATAR */
 #avatar{
 width:180px;
 height:180px;
@@ -44,28 +46,17 @@ animation:float 3s infinite alternate;
 }
 
 @keyframes float{
-from{
-transform:translateY(0px);
+from{transform:translateY(0px);}
+to{transform:translateY(-15px);}
 }
-to{
-transform:translateY(-15px);
-}
-}
+
 @keyframes talk{
-
-0%{
-transform:scale(1);
+0%{transform:scale(1);}
+50%{transform:scale(1.12);}
+100%{transform:scale(1);}
 }
 
-50%{
-transform:scale(1.12);
-}
-
-100%{
-transform:scale(1);
-}
-
-}  
+/* OLD CARDS (kept for safety) */
 .cards{
 display:flex;
 justify-content:center;
@@ -93,6 +84,72 @@ box-shadow:0 0 30px #00ffff;
 color:#00ffff;
 }
 
+/* ====== NEW FUTURISTIC AI UI ====== */
+
+.ai-center{
+display:flex;
+justify-content:center;
+gap:30px;
+flex-wrap:wrap;
+margin-top:50px;
+}
+
+.ai-card{
+width:300px;
+padding:30px;
+background:rgba(255,255,255,0.05);
+border-radius:20px;
+backdrop-filter:blur(15px);
+border:1px solid rgba(0,255,255,0.2);
+cursor:pointer;
+position:relative;
+overflow:hidden;
+transition:0.4s;
+}
+
+.ai-card:hover{
+transform:translateY(-10px) scale(1.05);
+box-shadow:0 0 40px #00ffff;
+border:1px solid #00ffff;
+}
+
+.ai-card h2{
+color:#00ffff;
+}
+
+.glow{
+position:absolute;
+top:-50%;
+left:-50%;
+width:200%;
+height:200%;
+background:linear-gradient(45deg,transparent,#00ffff33,transparent);
+animation:rotate 6s linear infinite;
+}
+
+@keyframes rotate{
+0%{transform:rotate(0deg);}
+100%{transform:rotate(360deg);}
+}
+
+.tag{
+display:inline-block;
+margin-top:15px;
+padding:5px 10px;
+border-radius:20px;
+background:rgba(0,255,255,0.1);
+border:1px solid rgba(0,255,255,0.4);
+font-size:12px;
+animation:pulse 1.5s infinite;
+}
+
+@keyframes pulse{
+0%{box-shadow:0 0 5px #00ffff;}
+50%{box-shadow:0 0 20px #00ffff;}
+100%{box-shadow:0 0 5px #00ffff;}
+}
+
+/* CHAT SECTION */
 .chat{
 margin-top:80px;
 max-width:700px;
@@ -133,27 +190,36 @@ min-height:100px;
 <div class="container">
 
 <h1>AI CENTER 🚀</h1>
-  <img src="ai-avatar.png" id="avatar">
 
-<div class="cards">
+<img src="ai-avatar.png" id="avatar">
 
-<div class="card" onclick="window.location.href='chatbot.html'">
-<h2>AI Chatbot</h2>
-<p>Advanced futuristic AI assistant.</p>
+<!-- FUTURISTIC AI CARDS -->
+<div class="ai-center">
+
+  <div class="ai-card" onclick="window.location.href='chatbot.html'">
+    <div class="glow"></div>
+    <h2>AI Chatbot</h2>
+    <p>Advanced futuristic AI assistant.</p>
+    <span class="tag">NEURAL CHAT 🤖</span>
+  </div>
+
+  <div class="ai-card" onclick="window.location.href='generator.html'">
+    <div class="glow"></div>
+    <h2>AI Generator</h2>
+    <p>Create futuristic ideas and concepts.</p>
+    <span class="tag">AI POWERED 🚀</span>
+  </div>
+
+  <div class="ai-card" onclick="window.location.href='dashboard.html'">
+    <div class="glow"></div>
+    <h2>AI Dashboard</h2>
+    <p>Real-time hologram system.</p>
+    <span class="tag">SYSTEM CORE ⚡</span>
+  </div>
+
 </div>
 
-<div class="card" onclick="window.location.href='generator.html'">
-<h2>AI Generator</h2>
-<p>Create futuristic ideas and concepts.</p>
-</div>
-
-<div class="card" onclick="window.location.href='dashboard.html'">
-<h2>AI Dashboard</h2>
-<p>Real-time hologram system.</p>
-</div>
-
-</div>
-
+<!-- CHAT -->
 <div class="chat">
 
 <h2>Talk To AI</h2>
@@ -162,9 +228,7 @@ min-height:100px;
 
 <button onclick="askAI()">Send</button>
 
-<button onclick="startVoice()">
-🎤 Speak
-</button>
+<button onclick="startVoice()">🎤 Speak</button>
 
 <div id="response"></div>
 
@@ -190,25 +254,19 @@ const response = await fetch(
 "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions",
 {
 method:"POST",
-
 headers:{
 "Content-Type":"application/json",
 "Authorization":"Bearer sk-c31927ba9ecd492d99830c199d06a5ec"
 },
-
 body:JSON.stringify({
-
 model:"qwen-plus",
-
 messages:[
 {
 role:"user",
 content:prompt
 }
 ]
-
 })
-
 }
 );
 
@@ -223,67 +281,51 @@ const speech =
 new SpeechSynthesisUtterance(aiText);
 
 speech.lang = "en-US";
-
 speech.rate = 1;
-
 speech.pitch = 1;
+
 const avatar =
 document.getElementById("avatar");
 
-avatar.style.animation =
-"talk 0.4s infinite";
+avatar.style.animation = "talk 0.4s infinite";
+
 speechSynthesis.speak(speech);
+
 speech.onend = function(){
-
-avatar.style.animation =
-"float 3s infinite alternate";
-
-};  
-  
-}
-catch(error){
-
-responseBox.innerHTML =
-"AI Error 🚨";
-
-console.log(error);
-
-}
-
-}
-  document
-.getElementById("prompt")
-.addEventListener("keypress",function(e){
-
-if(e.key === "Enter"){
-
-askAI();
-
-}
-
-});
-function startVoice(){
- 
-const recognition =
-new webkitSpeechRecognition();
-
-recognition.lang = "en-US";
-
-recognition.start();
-
-recognition.onresult = function(event){
-
-const speech =
-event.results[0][0].transcript;
-
-document.getElementById("prompt").value =
-speech;
-
-askAI();
-
+avatar.style.animation = "float 3s infinite alternate";
 };
 
 }
+catch(error){
+responseBox.innerHTML = "AI Error 🚨";
+console.log(error);
+}
+
+}
+
+/* ENTER KEY SUPPORT */
+document.getElementById("prompt")
+.addEventListener("keypress",function(e){
+if(e.key === "Enter"){
+askAI();
+}
+});
+
+/* VOICE INPUT */
+function startVoice(){
+
+const recognition = new webkitSpeechRecognition();
+recognition.lang = "en-US";
+recognition.start();
+
+recognition.onresult = function(event){
+const speech = event.results[0][0].transcript;
+document.getElementById("prompt").value = speech;
+askAI();
+};
+
+}
+
 </script>
 
 </body>
