@@ -33,7 +33,24 @@ font-size:70px;
 color:#00ffff;
 text-shadow:0 0 20px #00ffff;
 }
+#avatar{
+width:180px;
+height:180px;
+border-radius:50%;
+border:5px solid #00ffff;
+box-shadow:0 0 40px #00ffff;
+margin-top:20px;
+animation:float 3s infinite alternate;
+}
 
+@keyframes float{
+from{
+transform:translateY(0px);
+}
+to{
+transform:translateY(-15px);
+}
+}
 .cards{
 display:flex;
 justify-content:center;
@@ -101,6 +118,7 @@ min-height:100px;
 <div class="container">
 
 <h1>AI CENTER 🚀</h1>
+  <img src="ai-avatar.png" id="avatar">
 
 <div class="cards">
 
@@ -128,6 +146,10 @@ min-height:100px;
 <input type="text" id="prompt" placeholder="Ask AI anything...">
 
 <button onclick="askAI()">Send</button>
+
+<button onclick="startVoice()">
+🎤 Speak
+</button>
 
 <div id="response"></div>
 
@@ -177,8 +199,21 @@ content:prompt
 
 const data = await response.json();
 
-responseBox.innerHTML =
+const aiText =
 data.choices[0].message.content;
+
+responseBox.innerHTML = aiText;
+
+const speech =
+new SpeechSynthesisUtterance(aiText);
+
+speech.lang = "en-US";
+
+speech.rate = 1;
+
+speech.pitch = 1;
+
+speechSynthesis.speak(speech);
 
 }
 catch(error){
@@ -191,7 +226,28 @@ console.log(error);
 }
 
 }
+function startVoice(){
 
+const recognition =
+new webkitSpeechRecognition();
+
+recognition.lang = "en-US";
+
+recognition.start();
+
+recognition.onresult = function(event){
+
+const speech =
+event.results[0][0].transcript;
+
+document.getElementById("prompt").value =
+speech;
+
+askAI();
+
+};
+
+}
 </script>
 
 </body>
