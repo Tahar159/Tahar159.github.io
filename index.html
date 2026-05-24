@@ -982,19 +982,7 @@ const result = await response.text();
 
 console.log(result);
 
-if(data.choices && data.choices.length > 0){
-
-bot.innerText =
-data.choices[0].message.content;
-
-}else{
-
-bot.innerText =
-"AI Error 🚨";
-
-console.log(data);
-
-}
+bot.innerText = result;
 }
 catch(error){
 
