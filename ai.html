@@ -214,6 +214,16 @@ speech.rate = 1;
 speech.pitch = 1;
 
 speechSynthesis.speak(speech);
+  const avatar =
+document.getElementById("avatar");
+
+avatar.style.transform = "scale(1.1)";
+
+setTimeout(()=>{
+
+avatar.style.transform = "scale(1)";
+
+},2000);
 
 }
 catch(error){
