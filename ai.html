@@ -237,6 +237,17 @@ console.log(error);
 
 }
 function startVoice(){
+  document
+.getElementById("prompt")
+.addEventListener("keypress",function(e){
+
+if(e.key === "Enter"){
+
+askAI();
+
+}
+
+});
 
 const recognition =
 new webkitSpeechRecognition();
