@@ -978,11 +978,23 @@ content: text
 
 console.log(response.status);
 
-const result = await response.text();
+const data = await response.json();
 
-console.log(result);
+console.log(data);
 
-bot.innerText = result;
+if(data.choices && data.choices.length > 0){
+
+bot.innerText =
+data.choices[0].message.content;
+
+}else{
+
+bot.innerText =
+"AI Error 🚨";
+
+console.log(data);
+
+}
 }
 catch(error){
 
