@@ -978,9 +978,9 @@ content: text
 
 console.log(response.status);
 
-const data = await response.json();
+const result = await response.text();
 
-console.log(data);
+console.log(result);
 
 if(data.choices && data.choices.length > 0){
 
