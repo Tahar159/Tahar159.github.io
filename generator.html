@@ -6,6 +6,43 @@
 
 <style>
 
+#gallery{
+display:flex;
+flex-wrap:wrap;
+gap:10px;
+margin-top:20px;
+justify-content:center;
+}
+
+.image-box{
+position:relative;
+width:120px;
+height:120px;
+border-radius:10px;
+overflow:hidden;
+border:2px solid cyan;
+cursor:pointer;
+}
+
+.image-box img{
+width:100%;
+height:100%;
+object-fit:cover;
+}
+
+.image-box button{
+position:absolute;
+top:5px;
+right:5px;
+padding:5px;
+font-size:12px;
+border:none;
+border-radius:5px;
+background:red;
+color:white;
+cursor:pointer;
+}
+
 body{
 background:#050816;
 font-family:Arial;
@@ -48,16 +85,6 @@ input{
 margin:20px;
 }
 
-#preview{
-margin-top:20px;
-width:100%;
-max-height:400px;
-border-radius:20px;
-object-fit:cover;
-border:3px solid cyan;
-display:none;
-}
-
 video{
 width:100%;
 border-radius:20px;
@@ -70,6 +97,7 @@ display:none;
 }
 
 </style>
+
 </head>
 
 <body>
@@ -104,17 +132,17 @@ Stop Camera
 <canvas id="canvas"></canvas>
 
 <!-- Preview -->
-<img id="preview">
+<div id="gallery"></div>
 
 </div>
 
 <script>
 
 const imageInput = document.getElementById("imageInput");
-const preview = document.getElementById("preview");
 const video = document.getElementById("video");
 const canvas = document.getElementById("canvas");
 let cameraStream;
+let images = [];
 
 // Upload Image
 imageInput.addEventListener("change", function(){
@@ -126,10 +154,7 @@ if(file){
 const reader = new FileReader();
 
 reader.onload = function(e){
-
-preview.src = e.target.result;
-preview.style.display = "block";
-
+addImage(e.target.result);
 }
 
 reader.readAsDataURL(file);
@@ -171,9 +196,7 @@ const ctx = canvas.getContext("2d");
 ctx.drawImage(video, 0, 0);
 
 const imageData = canvas.toDataURL("image/png");
-
-preview.src = imageData;
-preview.style.display = "block";
+addImage(imageData);
 
 }
 function stopCamera(){
@@ -188,6 +211,38 @@ video.style.display = "none";
 
 }
 
+}
+  function addImage(src){
+images.push(src);
+renderGallery();
+}
+  function renderGallery(){
+
+const gallery = document.getElementById("gallery");
+gallery.innerHTML = "";
+
+images.forEach((img, index)=>{
+
+const div = document.createElement("div");
+div.className = "image-box";
+
+div.innerHTML = `
+<img src="${img}" onclick="selectImage(${index})">
+<button onclick="deleteImage(${index})">X</button>
+`;
+
+gallery.appendChild(div);
+
+});
+
+}
+  function selectImage(index){
+alert("Selected image #" + (index + 1));
+}
+
+function deleteImage(index){
+images.splice(index, 1);
+renderGallery();
 }
 </script>
 
