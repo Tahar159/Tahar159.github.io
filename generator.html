@@ -92,7 +92,9 @@ Take Photo
 <button onclick="capturePhoto()">
 Capture
 </button>
-
+<button onclick="stopCamera()">
+Stop Camera
+</button>
 <br>
 
 <!-- Camera -->
@@ -112,7 +114,7 @@ const imageInput = document.getElementById("imageInput");
 const preview = document.getElementById("preview");
 const video = document.getElementById("video");
 const canvas = document.getElementById("canvas");
-
+let cameraStream;
 
 // Upload Image
 imageInput.addEventListener("change", function(){
@@ -142,11 +144,11 @@ async function openCamera(){
 
 try{
 
-const stream = await navigator.mediaDevices.getUserMedia({
+cameraStream = await navigator.mediaDevices.getUserMedia({
 video:true
 });
 
-video.srcObject = stream;
+video.srcObject = cameraStream;
 video.style.display = "block";
 
 }catch(error){
@@ -174,7 +176,19 @@ preview.src = imageData;
 preview.style.display = "block";
 
 }
+function stopCamera(){
 
+if(cameraStream){
+
+cameraStream.getTracks().forEach(track => {
+track.stop();
+});
+
+video.style.display = "none";
+
+}
+
+}
 </script>
 
 </body>
