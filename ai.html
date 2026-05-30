@@ -12,14 +12,32 @@ body{
 margin:0;
 font-family:'Segoe UI',sans-serif;
 background:
-radial-gradient(circle at top left,#00ffff22,transparent 30%),
-radial-gradient(circle at bottom right,#7b00ff22,transparent 30%),
-linear-gradient(135deg,#030712,#0a1025,#050816);
+radial-gradient(circle at 20% 20%, rgba(0,255,255,0.15), transparent 35%),
+radial-gradient(circle at 80% 80%, rgba(120,0,255,0.15), transparent 35%),
+radial-gradient(circle at 50% 50%, rgba(0,150,255,0.08), transparent 60%),
+#050816;
 color:white;
 overflow-x:hidden;
 min-height:100vh;
 }
+body::before{
+content:"";
+position:fixed;
+width:100%;
+height:100%;
+top:0;
+left:0;
+background:
+radial-gradient(circle at 30% 30%, rgba(0,255,255,0.08), transparent 40%),
+radial-gradient(circle at 70% 70%, rgba(255,0,255,0.06), transparent 40%);
+animation: moveGlow 8s infinite alternate;
+z-index:-1;
+}
 
+@keyframes moveGlow{
+from{transform:scale(1);}
+to{transform:scale(1.2);}
+}
 canvas{
 position:fixed;
 top:0;
@@ -28,8 +46,10 @@ z-index:-1;
 }
 
 .container{
-padding:50px;
+padding:60px 20px;
 text-align:center;
+max-width:1200px;
+margin:auto;
 }
 
 h1{
@@ -206,10 +226,7 @@ inset 0 0 10px rgba(0,255,255,0.2);
 
 transform:scale(1.02);
 }
-  input{
-animation: inputGlow 4s infinite alternate;
-}
-
+ 
 @keyframes inputGlow{
 0%{
 box-shadow:
@@ -224,22 +241,38 @@ inset 0 0 12px rgba(255,255,255,0.08);
 }
 }
 
-input:focus{
-border:1px solid #00ffff;
-box-shadow:
-0 0 15px #00ffff,
-0 0 30px rgba(0,255,255,0.3);
-}
 
 button{
 padding:15px 25px;
 border:none;
-border-radius:10px;
-background:#00ffff;
+border-radius:14px;
+background:linear-gradient(135deg,#00ffff,#0088ff);
+color:#001018;
 font-weight:bold;
 cursor:pointer;
+box-shadow:0 0 20px rgba(0,255,255,0.25);
+transition:0.3s ease;
+}
+button.primary{
+background:linear-gradient(135deg,#00ffff,#0066ff);
 }
 
+button.voice{
+background:rgba(255,255,255,0.08);
+color:white;
+border:1px solid rgba(0,255,255,0.4);
+backdrop-filter:blur(10px);
+}
+
+button.voice:hover{
+background:rgba(0,255,255,0.15);
+}
+button:hover{
+transform:scale(1.06);
+box-shadow:
+0 0 25px rgba(0,255,255,0.4),
+0 0 60px rgba(0,255,255,0.2);
+}
 #response{
 margin-top:30px;
 padding:25px;
@@ -309,9 +342,9 @@ min-width:140px;
 
 <div class="buttons">
 
-<button onclick="askAI()">🚀 Send</button>
+<button class="primary" onclick="askAI()">🚀 Send</button>
 
-<button onclick="startVoice()">🎤 Speak</button>
+<button class="voice" onclick="startVoice()">🎤 Speak</button>
 
 </div>
 
