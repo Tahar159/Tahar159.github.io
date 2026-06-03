@@ -47,7 +47,48 @@ height:100%;
 z-index:0;
 pointer-events:none;
 }
+body::after{
 
+content:"";
+
+position:fixed;
+
+top:-50%;
+left:-50%;
+
+width:200%;
+height:200%;
+
+background-image:
+
+linear-gradient(
+rgba(0,255,255,0.03) 1px,
+transparent 1px
+),
+
+linear-gradient(
+90deg,
+rgba(0,255,255,0.03) 1px,
+transparent 1px
+);
+
+background-size:60px 60px;
+
+animation:gridRotate 60s linear infinite;
+
+z-index:-3;
+}
+
+@keyframes gridRotate{
+
+from{
+transform:rotate(0deg);
+}
+
+to{
+transform:rotate(360deg);
+}
+}
 .container{
 position:relative;
 z-index:1;
@@ -80,8 +121,50 @@ box-shadow:
 0 0 100px #00ffff55;
 margin-top:20px;
 animation:float 3s infinite alternate;
+  position:relative;
+z-index:2;
+}
+.avatar-container{
+
+position:relative;
+
+display:inline-block;
+
 }
 
+.hologram-ring{
+
+position:absolute;
+
+top:-20px;
+left:-20px;
+
+width:260px;
+height:260px;
+
+border-radius:50%;
+
+border:2px solid rgba(0,255,255,0.3);
+
+animation:holoPulse 3s infinite;
+
+pointer-events:none;
+
+}
+
+@keyframes holoPulse{
+
+0%{
+transform:scale(1);
+opacity:1;
+}
+
+100%{
+transform:scale(1.5);
+opacity:0;
+}
+
+}
 @keyframes float{
 from{transform:translateY(0px);}
 to{transform:translateY(-15px);}
@@ -134,23 +217,41 @@ margin-top:50px;
 .ai-card{
 width:320px;
 padding:35px;
-background:rgba(255,255,255,0.04);
+
+background:rgba(255,255,255,0.08);
+
+backdrop-filter:blur(30px);
+-webkit-backdrop-filter:blur(30px);
+
+border:1px solid rgba(255,255,255,0.15);
+
 border-radius:30px;
-backdrop-filter:blur(20px);
-border:1px solid rgba(255,255,255,0.1);
+
 cursor:pointer;
 position:relative;
 overflow:hidden;
+
 transition:0.5s;
-box-shadow:0 0 30px rgba(0,255,255,0.08);
+
+box-shadow:
+0 8px 32px rgba(0,0,0,0.4),
+0 0 30px rgba(0,255,255,0.1);
+
 }
 
 .ai-card:hover{
-transform:translateY(-15px) scale(1.05);
+
+transform:
+translateY(-15px)
+scale(1.05);
+
+border:1px solid rgba(0,255,255,0.7);
+
 box-shadow:
-0 0 20px #00ffff,
-0 0 50px #00ffff;
-border:1px solid #00ffff;
+0 15px 40px rgba(0,255,255,0.2),
+0 0 40px rgba(0,255,255,0.4),
+0 0 100px rgba(0,255,255,0.2);
+
 }
 
 .ai-card h2{
@@ -159,12 +260,24 @@ color:#00ffff;
 
 .glow{
 position:absolute;
+
 top:-50%;
 left:-50%;
+
 width:200%;
 height:200%;
-background:linear-gradient(45deg,transparent,#00ffff33,transparent);
-animation:rotate 6s linear infinite;
+
+background:
+conic-gradient(
+from 0deg,
+transparent,
+rgba(0,255,255,0.2),
+transparent,
+rgba(255,0,255,0.15),
+transparent
+);
+
+animation:rotate 10s linear infinite;
 }
 
 @keyframes rotate{
@@ -310,7 +423,13 @@ min-width:140px;
 
 <h1>AI CENTER 🚀</h1>
 
+<div class="avatar-container">
+
 <img src="ai-avatar.png" id="avatar">
+
+<div class="hologram-ring"></div>
+
+</div>
 
 <!-- FUTURISTIC AI CARDS -->
 <div class="ai-center">
@@ -488,17 +607,53 @@ class Particle {
 }
 
 function initParticles(){
-  for(let i = 0; i < 80; i++){
+  for(let i = 0; i < 150; i++){
     particlesArray.push(new Particle());
   }
 }
 
 function animateParticles(){
+
   ctx.clearRect(0,0,canvas.width,canvas.height);
 
   for(let i = 0; i < particlesArray.length; i++){
+
     particlesArray[i].update();
     particlesArray[i].draw();
+
+    for(let j = i + 1; j < particlesArray.length; j++){
+
+      const dx =
+      particlesArray[i].x - particlesArray[j].x;
+
+      const dy =
+      particlesArray[i].y - particlesArray[j].y;
+
+      const distance =
+      Math.sqrt(dx * dx + dy * dy);
+
+      if(distance < 120){
+
+        ctx.beginPath();
+
+        ctx.strokeStyle =
+        `rgba(0,255,255,${1 - distance/120})`;
+
+        ctx.lineWidth = 0.5;
+
+        ctx.moveTo(
+        particlesArray[i].x,
+        particlesArray[i].y
+        );
+
+        ctx.lineTo(
+        particlesArray[j].x,
+        particlesArray[j].y
+        );
+
+        ctx.stroke();
+      }
+    }
   }
 
   requestAnimationFrame(animateParticles);
@@ -512,6 +667,36 @@ window.addEventListener("resize", () => {
 
   particlesArray = [];
   initParticles();
+});
+  document.addEventListener("mousemove",(e)=>{
+
+const glow = document.createElement("div");
+
+glow.style.position="fixed";
+
+glow.style.left=e.clientX+"px";
+
+glow.style.top=e.clientY+"px";
+
+glow.style.width="8px";
+
+glow.style.height="8px";
+
+glow.style.borderRadius="50%";
+
+glow.style.background="#00ffff";
+
+glow.style.boxShadow=
+"0 0 20px #00ffff";
+
+glow.style.pointerEvents="none";
+
+document.body.appendChild(glow);
+
+setTimeout(()=>{
+glow.remove();
+},300);
+
 });
 </script>
 
