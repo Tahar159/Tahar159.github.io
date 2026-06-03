@@ -89,6 +89,34 @@ to{
 transform:rotate(360deg);
 }
 }
+#cursor-glow{
+
+position:fixed;
+
+width:250px;
+height:250px;
+
+border-radius:50%;
+
+background:
+radial-gradient(
+circle,
+rgba(0,255,255,0.25),
+transparent 70%
+);
+
+pointer-events:none;
+
+transform:
+translate(-50%,-50%);
+
+z-index:0;
+
+transition:
+left 0.08s linear,
+top 0.08s linear;
+
+}  
 .container{
 position:relative;
 z-index:1;
@@ -419,6 +447,7 @@ min-width:140px;
 
 <body>
 <canvas id="particles"></canvas>
+  <div id="cursor-glow"></div>
 <div class="container">
 
 <h1>AI CENTER 🚀</h1>
@@ -668,34 +697,16 @@ window.addEventListener("resize", () => {
   particlesArray = [];
   initParticles();
 });
-  document.addEventListener("mousemove",(e)=>{
+ const cursorGlow =
+document.getElementById("cursor-glow");
 
-const glow = document.createElement("div");
+document.addEventListener("mousemove",(e)=>{
 
-glow.style.position="fixed";
+cursorGlow.style.left =
+e.clientX + "px";
 
-glow.style.left=e.clientX+"px";
-
-glow.style.top=e.clientY+"px";
-
-glow.style.width="8px";
-
-glow.style.height="8px";
-
-glow.style.borderRadius="50%";
-
-glow.style.background="#00ffff";
-
-glow.style.boxShadow=
-"0 0 20px #00ffff";
-
-glow.style.pointerEvents="none";
-
-document.body.appendChild(glow);
-
-setTimeout(()=>{
-glow.remove();
-},300);
+cursorGlow.style.top =
+e.clientY + "px";
 
 });
 </script>
