@@ -1,33 +1,213 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
-<title>AI Chatbot</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Assistant</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Marked.js for markdown -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <!-- DOMPurify for Ultimate Security -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js"></script>
+    <!-- Prism.js for code highlighting -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-css.min.js"></script>
 
-<style>
-
-body{
-background:black;
-color:#00ffff;
-font-family:Arial;
-text-align:center;
-padding-top:100px;
-}
-
-h1{
-font-size:60px;
-}
-
-</style>
-
+    <style>
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 9999px; }
+        ::-webkit-scrollbar-thumb:hover { background: #6b7280; }
+        .markdown-body pre { background: #1e1e1e; border-radius: 0.5rem; padding: 1rem; margin: 0.5rem 0; overflow-x: auto; }
+        .markdown-body code { font-family: monospace; font-size: 0.9em; }
+        .markdown-body p { margin-bottom: 0.75rem; }
+        .markdown-body ul, .markdown-body ol { margin-left: 1.5rem; margin-bottom: 0.75rem; list-style-type: disc; }
+    </style>
 </head>
+<body class="bg-[#111214] text-[#e3e3e3] font-sans h-screen flex flex-col">
 
-<body>
+    <!-- Header -->
+    <header class="flex items-center justify-between px-6 py-3 border-b border-[#2d2f34] bg-[#1e1f20] z-10">
+        <div class="flex items-center space-x-3">
+            <div class="bg-gradient-to-tr from-blue-500 to-purple-500 w-8 h-8 rounded-full flex items-center justify-center shadow-md">
+                <i class="fas fa-robot text-white text-sm"></i>
+            </div>
+            <span class="font-semibold text-lg tracking-wide bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">Qwen Assistant</span>
+        </div>
+        <div class="flex items-center space-x-4">
+            <button id="clearBtn" class="text-gray-400 hover:text-white transition-colors text-sm flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-[#2d2f34]">
+                <i class="fas fa-trash-alt"></i> <span class="hidden sm:inline">Clear</span>
+            </button>
+        </div>
+    </header>
 
-<h1>FUTURISTIC AI CHATBOT 🤖</h1>
+    <!-- Chat Workspace -->
+    <main class="flex-1 overflow-y-auto px-4 py-6 md:px-0 flex flex-col items-center">
+        <div id="chatContainer" class="w-full max-w-3xl space-y-6 mb-24">
+            <div id="welcomeScreen" class="flex flex-col items-center justify-center text-center pt-20 px-4 space-y-4">
+                <h1 class="text-4xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">How can I help you today?</h1>
+                <p class="text-gray-400 max-w-md text-sm">Ask anything. Powered by Aliyun Qwen.</p>
+            </div>
+        </div>
+    </main>
 
-<p>Welcome to Tahar AI Assistant</p>
+    <!-- Input Bar -->
+    <footer class="fixed bottom-0 left-0 right-0 bg-gradient-to-t from-[#111214] via-[#111214] to-transparent pt-6 pb-6 flex justify-center px-4">
+        <div class="w-full max-w-3xl relative flex flex-col items-center">
+            <form id="chatForm" class="w-full flex items-end bg-[#222327] border border-[#3c3d42] rounded-2xl px-4 py-3 shadow-2xl focus-within:border-gray-500 transition-colors">
+                <textarea id="userInput" rows="1" placeholder="Message Qwen..." class="w-full bg-transparent outline-none resize-none text-white placeholder-gray-500 max-h-48 leading-relaxed text-[15px]" required></textarea>
+                <button type="submit" id="sendBtn" class="ml-3 bg-white text-black w-9 h-9 rounded-xl flex items-center justify-center hover:bg-gray-200 transition-all disabled:opacity-30 disabled:cursor-not-allowed" disabled>
+                    <i class="fas fa-arrow-up text-sm"></i>
+                </button>
+            </form>
+            <div class="text-[11px] text-gray-500 mt-2 text-center">
+                AI may generate inaccurate information. Check critical facts.
+            </div>
+        </div>
+    </footer>
 
+    <!-- Application Logic -->
+    <script>
+        const API_ENDPOINT = "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions";
+        const MAX_HISTORY_MESSAGES = 20; 
+        
+        // ⬇️ ⬇️ PASTE YOUR ALIYUN API CODE INSIDE THE QUOTES BELOW ⬇️ ⬇️
+        const ALIYUN_API_KEY = "sk-c31927ba9ecd492d99830c199d06a5ec";
+        
+        // ⬇️ CHOOSE YOUR MODEL HERE ("qwen-plus", "qwen-max", or "qwen-turbo")
+        const QWEN_MODEL = "qwen-plus"; 
+        
+        let chatHistory = [];
+        
+        // DOM Elements
+        const DOM = {
+            container: document.getElementById('chatContainer'),
+            welcome: document.getElementById('welcomeScreen'),
+            form: document.getElementById('chatForm'),
+            input: document.getElementById('userInput'),
+            sendBtn: document.getElementById('sendBtn'),
+            clearBtn: document.getElementById('clearBtn')
+        };
+
+        DOM.input.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 200) + 'px';
+            DOM.sendBtn.disabled = !this.value.trim();
+        });
+
+        DOM.input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                if(!DOM.sendBtn.disabled) DOM.form.requestSubmit();
+            }
+        });
+
+        DOM.clearBtn.addEventListener('click', () => {
+            chatHistory = [];
+            DOM.container.innerHTML = '';
+            DOM.container.appendChild(DOM.welcome);
+            DOM.welcome.classList.remove('hidden');
+        });
+
+        function appendMessage(role, text) {
+            DOM.welcome.classList.add('hidden');
+            const row = document.createElement('div');
+            row.className = `flex w-full items-start gap-4 p-4 rounded-xl ${role === 'user' ? 'justify-end' : 'justify-start'}`;
+
+            const box = document.createElement('div');
+            box.className = `max-w-2xl px-4 py-2.5 rounded-2xl text-[15px] leading-relaxed shadow-sm ${
+                role === 'user' ? 'bg-[#2f3037] text-white rounded-br-none' : 'bg-transparent text-[#e3e3e3] markdown-body w-full'
+            }`;
+
+            if (role === 'user') {
+                box.textContent = text;
+            } else {
+                const rawHtml = marked.parse(text);
+                box.innerHTML = DOMPurify.sanitize(rawHtml);
+                setTimeout(() => Prism.highlightAllUnder(box), 10);
+            }
+
+            if (role !== 'user') {
+                const avatar = document.createElement('div');
+                avatar.className = "w-8 h-8 rounded-full bg-emerald-600 flex items-center justify-center flex-shrink-0 text-white text-xs mt-1";
+                avatar.innerHTML = '<i class="fas fa-brain"></i>';
+                row.appendChild(avatar);
+            }
+
+            row.appendChild(box);
+            DOM.container.appendChild(row);
+            DOM.container.scrollIntoView({ behavior: 'smooth', block: 'end' });
+            return box;
+        }
+
+        async function fetchWithRetry(url, options, retries = 2) {
+            for (let i = 0; i < retries; i++) {
+                try {
+                    const res = await fetch(url, options);
+                    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                    return await res.json();
+                } catch (err) {
+                    if (i === retries - 1) throw err;
+                    await new Promise(r => setTimeout(r, 1000 * (i + 1)));
+                }
+            }
+        }
+
+        DOM.form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const message = DOM.input.value.trim();
+
+            if (!ALIYUN_API_KEY || ALIYUN_API_KEY === "PASTE_YOUR_API_KEY_HERE") {
+                alert("Error: You forgot to replace 'PASTE_YOUR_API_KEY_HERE' in the code script section!");
+                return;
+            }
+
+            appendMessage('user', message);
+            DOM.input.value = '';
+            DOM.input.style.height = 'auto';
+            DOM.sendBtn.disabled = true;
+
+            chatHistory.push({ role: "user", content: message });
+            if (chatHistory.length > MAX_HISTORY_MESSAGES) {
+                chatHistory = chatHistory.slice(-MAX_HISTORY_MESSAGES);
+            }
+
+            const aiNode = appendMessage('assistant', '<i class="fas fa-circle-notch fa-spin text-gray-500"></i> Thinking...');
+
+            try {
+                const data = await fetchWithRetry(API_ENDPOINT, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${ALIYUN_API_KEY}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        model: QWEN_MODEL,
+                        messages: chatHistory,
+                        temperature: 0.7
+                    })
+                });
+
+                const aiReply = data.choices[0].message.content;
+                aiNode.innerHTML = DOMPurify.sanitize(marked.parse(aiReply));
+                Prism.highlightAllUnder(aiNode);
+                
+                chatHistory.push({ role: "assistant", content: aiReply });
+
+            } catch (err) {
+                console.error(err);
+                aiNode.innerHTML = `<span class="text-red-400"><i class="fas fa-exclamation-triangle mr-2"></i>Connection failed. Please check your API key validity.</span>`;
+                chatHistory.pop();
+            } finally {
+                DOM.container.scrollIntoView({ behavior: 'smooth', block: 'end' });
+            }
+        });
+    </script>
 </body>
-
 </html>
