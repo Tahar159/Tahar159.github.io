@@ -24,10 +24,13 @@
         .markdown-body ul, .markdown-body ol { margin-left: 1.5rem; margin-bottom: 0.75rem; list-style-type: disc; }
     </style>
 </head>
-<body class="bg-[#111214] text-[#e3e3e3] font-sans h-screen flex flex-col">
+<body class="bg-[#111214] text-[#e3e3e3] font-sans h-screen flex flex-col overflow-hidden">
 
-    <header class="flex items-center justify-between px-6 py-3 border-b border-[#2d2f34] bg-[#1e1f20] z-10">
+    <header class="flex items-center justify-between px-6 py-3 border-b border-[#2d2f34] bg-[#1e1f20] z-10 shrink-0">
         <div class="flex items-center space-x-3">
+            <button id="sidebarToggle" class="text-gray-400 hover:text-white mr-1 md:hidden">
+                <i class="fas fa-bars text-lg"></i>
+            </button>
             <div class="bg-gradient-to-tr from-purple-500 to-indigo-500 w-8 h-8 rounded-full flex items-center justify-center shadow-md">
                 <i class="fas fa-brain text-white text-sm"></i>
             </div>
@@ -35,98 +38,123 @@
         </div>
         <div class="flex items-center space-x-4">
             <button id="clearBtn" class="text-gray-400 hover:text-white transition-colors text-sm flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-[#2d2f34]">
-                <i class="fas fa-trash-alt"></i> <span>Clear Chat</span>
+                <i class="fas fa-trash-alt"></i> <span>Wipe All Sessions</span>
             </button>
         </div>
     </header>
 
-    <div class="bg-[#16171a] border-b border-[#2d2f34] px-6 py-2.5 flex items-center justify-between text-xs text-gray-400">
-        <div class="flex items-center gap-2">
-            <i class="fas fa-book-open text-purple-400 text-sm"></i>
-            <span class="font-medium text-gray-300">Knowledge Page:</span>
-            <span id="pdfStatus" class="italic text-gray-500">No PDF uploaded yet</span>
-        </div>
-        <div class="flex items-center gap-3">
-            <input type="file" id="pdfFileInput" accept=".pdf" class="hidden">
+    <div class="flex flex-1 h-full overflow-hidden w-full relative">
+        
+        <aside id="sidebarPanel" class="w-64 bg-[#16171a] border-r border-[#2d2f34] flex flex-col shrink-0 absolute inset-y-0 left-0 transform -translate-x-full md:relative md:translate-x-0 transition-transform duration-300 ease-in-out z-20">
+            <div class="p-4 shrink-0">
+                <button id="newChatBtn" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-medium py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 transition-all shadow-md">
+                    <i class="fas fa-plus text-xs"></i> New Chat
+                </button>
+            </div>
+            <div class="px-3 pb-2 text-[11px] font-bold tracking-wider text-gray-500 uppercase shrink-0">Recent Activity Logs</div>
+            <div id="sessionHistoryList" class="flex-1 overflow-y-auto px-2 space-y-1 pb-4">
+                </div>
+        </aside>
+
+        <div class="flex-1 flex flex-col h-full overflow-hidden relative">
             
-            <button id="uploadPdfBtn" class="bg-[#2d2f34] hover:bg-[#3c3d42] text-white px-3 py-1 rounded-md transition-colors flex items-center gap-1.5 cursor-pointer">
-                <i class="fas fa-file-pdf text-red-400"></i> Upload PDF
-            </button>
-            
-            <button id="removePdfBtn" class="bg-red-950/40 hover:bg-red-900/60 text-red-400 px-3 py-1 rounded-md transition-colors hidden items-center gap-1.5 cursor-pointer">
-                <i class="fas fa-trash"></i> Remove PDF
-            </button>
+            <div class="bg-[#16171a] border-b border-[#2d2f34] px-6 py-2.5 flex items-center justify-between text-xs text-gray-400 shrink-0">
+                <div class="flex items-center gap-2">
+                    <i class="fas fa-book-open text-purple-400 text-sm"></i>
+                    <span class="font-medium text-gray-300">Knowledge Page:</span>
+                    <span id="pdfStatus" class="italic text-gray-500">No PDF uploaded yet</span>
+                </div>
+                <div class="flex items-center gap-3">
+                    <input type="file" id="pdfFileInput" accept=".pdf" class="hidden">
+                    <button id="uploadPdfBtn" class="bg-[#2d2f34] hover:bg-[#3c3d42] text-white px-3 py-1 rounded-md transition-colors flex items-center gap-1.5 cursor-pointer">
+                        <i class="fas fa-file-pdf text-red-400"></i> Upload PDF
+                    </button>
+                    <button id="removePdfBtn" class="bg-red-950/40 hover:bg-red-900/60 text-red-400 px-3 py-1 rounded-md transition-colors hidden items-center gap-1.5 cursor-pointer">
+                        <i class="fas fa-trash"></i> Remove PDF
+                    </button>
+                </div>
+            </div>
+
+            <main class="flex-1 overflow-y-auto px-4 py-6 md:px-0 flex flex-col items-center">
+                <div id="chatContainer" class="w-full max-w-3xl space-y-6 mb-36">
+                    <div id="welcomeScreen" class="flex flex-col items-center justify-center text-center pt-16 px-4 space-y-4">
+                        <h1 class="text-4xl font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-emerald-400 bg-clip-text text-transparent">Welcome to your AI Studio</h1>
+                        <p class="text-gray-400 max-w-md text-sm">Upload documentation files, attach code scripts, or use the quick research macros down below to get started immediately.</p>
+                    </div>
+                </div>
+            </main>
+
+            <footer class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-[#111214] via-[#111214] to-transparent pt-4 pb-6 flex justify-center px-4 z-10 shrink-0">
+                <div class="w-full max-w-3xl relative flex flex-col items-center">
+                    
+                    <div id="mediaPreviewContainer" class="w-full hidden bg-[#1e1f20] p-3 mb-2 rounded-xl border border-[#3c3d42] justify-between items-center">
+                        <div class="flex items-center gap-3">
+                            <img id="imagePreview" class="h-14 w-14 rounded-lg object-cover border border-[#4b5563] hidden" src="" alt="Preview">
+                            <div id="videoPreviewIndicator" class="h-12 w-12 rounded-lg bg-blue-950/50 border border-blue-800 flex items-center justify-center text-blue-400 hidden">
+                                <i class="fas fa-video text-lg"></i>
+                            </div>
+                            <div class="flex flex-col">
+                                <span id="mediaTypeLabel" class="text-xs text-emerald-400 font-semibold">Media staged</span>
+                                <span id="mediaDetailLabel" class="text-[11px] text-gray-400 max-w-md truncate">Details</span>
+                            </div>
+                        </div>
+                        <button type="button" id="removeMediaBtn" class="text-gray-400 hover:text-red-400 p-2 transition-colors">
+                            <i class="fas fa-times text-lg"></i>
+                        </button>
+                    </div>
+
+                    <div class="w-full flex flex-wrap gap-2 mb-3 justify-start md:justify-center text-xs px-1 overflow-x-auto max-w-full pb-1 whitespace-nowrap">
+                        <button type="button" class="quick-action-btn bg-[#1e1f20] hover:bg-[#2d2f34] border border-[#2d2f34] text-gray-300 px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5 shadow-sm inline-block" data-prompt="Please review the active Aliyun documentation text attached above. Summarize its structural integration rules, parameter requirements, and provide a clean request example mapping to these guidelines.">
+                            <i class="fas fa-book text-orange-400"></i> Read Aliyun Docs
+                        </button>
+                        <button type="button" class="quick-action-btn bg-[#1e1f20] hover:bg-[#2d2f34] border border-[#2d2f34] text-gray-300 px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5 shadow-sm inline-block" data-prompt="Act as an expert Senior Aliyun Solutions Engineer. I need to design a highly scalable infrastructure setup using DashScope APIs. Explain how to prevent rate limits and optimize multi-modal execution.">
+                            <i class="fas fa-cloud text-blue-400"></i> Ask Aliyun Expert
+                        </button>
+                        <button type="button" class="quick-action-btn bg-[#1e1f20] hover:bg-[#2d2f34] border border-[#2d2f34] text-gray-300 px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5 shadow-sm inline-block" data-prompt="Extract the core components of the active research document: 1) Core Hypothesis/Problem statement, 2) Precise Methodology used, 3) Primary data results, 4) Critical flaws or next steps for subsequent research implementation.">
+                            <i class="fas fa-microscope text-purple-400"></i> Deep Research Guide
+                        </button>
+                        <button type="button" class="quick-action-btn bg-[#1e1f20] hover:bg-[#2d2f34] border border-[#2d2f34] text-gray-300 px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5 shadow-sm inline-block" data-prompt="Perform a complete code logic review on the provided source code context. Explain exactly what this script achieves, list each primary function block with its engineering purpose, and identify any architectural bottlenecks or optimization areas.">
+                            <i class="fas fa-code text-emerald-400"></i> Summarize Source Code
+                        </button>
+                    </div>
+
+                    <form id="chatForm" class="w-full flex items-end bg-[#222327] border border-[#3c3d42] rounded-2xl px-4 py-3 shadow-2xl focus-within:border-gray-500 transition-colors">
+                        <div class="flex items-center gap-3 mr-2 pb-1">
+                            <input type="file" id="imageInput" accept="image/*" class="hidden">
+                            <button type="button" id="uploadImageBtn" class="text-gray-400 hover:text-emerald-400 transition-colors cursor-pointer" title="Take Photo or Album Upload">
+                                <i class="fas fa-camera text-xl"></i>
+                            </button>
+                            <button type="button" id="uploadVideoBtn" class="text-gray-400 hover:text-blue-400 transition-colors cursor-pointer" title="Analyze Remote Video URL">
+                                <i class="fas fa-video text-xl"></i>
+                            </button>
+                        </div>
+
+                        <textarea id="userInput" rows="1" placeholder="Message Qwen Bot or choose a preset macro..." class="w-full bg-transparent outline-none resize-none text-white placeholder-gray-500 max-h-48 leading-relaxed text-[15px]"></textarea>
+                        
+                        <button type="submit" id="sendBtn" class="ml-3 bg-white text-black w-9 h-9 rounded-xl flex items-center justify-center hover:bg-gray-200 transition-all disabled:opacity-30 disabled:cursor-not-allowed shadow-md" disabled>
+                            <i class="fas fa-arrow-up text-sm"></i>
+                        </button>
+                    </form>
+                </div>
+            </footer>
         </div>
     </div>
-
-    <main class="flex-1 overflow-y-auto px-4 py-6 md:px-0 flex flex-col items-center">
-        <div id="chatContainer" class="w-full max-w-3xl space-y-6 mb-28">
-            <div id="welcomeScreen" class="flex flex-col items-center justify-center text-center pt-16 px-4 space-y-4">
-                <h1 class="text-4xl font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-emerald-400 bg-clip-text text-transparent">Welcome to your AI Studio</h1>
-                <p class="text-gray-400 max-w-md text-sm">Upload a PDF knowledge file, attach an image from your camera roll, paste a video URL, or simply start typing a message.</p>
-            </div>
-        </div>
-    </main>
-
-    <footer class="fixed bottom-0 left-0 right-0 bg-gradient-to-t from-[#111214] via-[#111214] to-transparent pt-4 pb-6 flex justify-center px-4">
-        <div class="w-full max-w-3xl relative flex flex-col items-center">
-            
-            <div id="mediaPreviewContainer" class="w-full hidden bg-[#1e1f20] p-3 mb-2 rounded-xl border border-[#3c3d42] justify-between items-center animate-fade-in">
-                <div class="flex items-center gap-3">
-                    <img id="imagePreview" class="h-14 w-14 rounded-lg object-cover border border-[#4b5563] hidden" src="" alt="Preview">
-                    <div id="videoPreviewIndicator" class="h-12 w-12 rounded-lg bg-blue-950/50 border border-blue-800 flex items-center justify-center text-blue-400 hidden">
-                        <i class="fas fa-video text-lg"></i>
-                    </div>
-                    <div class="flex flex-col">
-                        <span id="mediaTypeLabel" class="text-xs text-emerald-400 font-semibold">Media staged</span>
-                        <span id="mediaDetailLabel" class="text-[11px] text-gray-400 max-w-md truncate">Details</span>
-                    </div>
-                </div>
-                <button type="button" id="removeMediaBtn" class="text-gray-400 hover:text-red-400 p-2 transition-colors">
-                    <i class="fas fa-times text-lg"></i>
-                </button>
-            </div>
-
-            <form id="chatForm" class="w-full flex items-end bg-[#222327] border border-[#3c3d42] rounded-2xl px-4 py-3 shadow-2xl focus-within:border-gray-500 transition-colors">
-                
-                <div class="flex items-center gap-3 mr-2 pb-1">
-                    <input type="file" id="imageInput" accept="image/*" class="hidden">
-                    <button type="button" id="uploadImageBtn" class="text-gray-400 hover:text-emerald-400 transition-colors cursor-pointer" title="Take Photo or Album Upload">
-                        <i class="fas fa-camera text-xl"></i>
-                    </button>
-
-                    <button type="button" id="uploadVideoBtn" class="text-gray-400 hover:text-blue-400 transition-colors cursor-pointer" title="Analyze Remote Video URL">
-                        <i class="fas fa-video text-xl"></i>
-                    </button>
-                </div>
-
-                <textarea id="userInput" rows="1" placeholder="Message Qwen Bot..." class="w-full bg-transparent outline-none resize-none text-white placeholder-gray-500 max-h-48 leading-relaxed text-[15px]"></textarea>
-                
-                <button type="submit" id="sendBtn" class="ml-3 bg-white text-black w-9 h-9 rounded-xl flex items-center justify-center hover:bg-gray-200 transition-all disabled:opacity-30 disabled:cursor-not-allowed shadow-md" disabled>
-                    <i class="fas fa-arrow-up text-sm"></i>
-                </button>
-            </form>
-            <div class="text-[11px] text-gray-500 mt-2 text-center">
-                System handles custom local PDFs, direct Base64 imaging, and Web Video links.
-            </div>
-        </div>
-    </footer>
 
     <script>
         const API_ENDPOINT = "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions";
         const MAX_HISTORY_MESSAGES = 12;
         
-        // ⬇️ ⬇️ PASTE YOUR ALIYUN API CODE INSIDE THE QUOTES BELOW ⬇️ ⬇️
+        // ⬇️ ⬇️ PASTE YOUR ALIYUN API CODE INSIDE THE QUOTES BELOW (~Line 193) ⬇️ ⬇️
         const ALIYUN_API_KEY = "sk-c31927ba9ecd492d99830c199d06a5ec";
-        
-        // Using the primary multimodal vision-and-video model configuration
         const QWEN_MODEL = "qwen-vl-plus"; 
         
-        // State Variables
+        // State Management Registers
         let chatHistory = [];
         let selectedImageBase64 = null;
         let stagedVideoUrl = null;
         let extractedPdfText = "";
+        let currentSessionId = null; 
+        let chatSessionsRegistry = {}; 
 
         // UI DOM Access Registry
         const DOM = {
@@ -135,7 +163,11 @@
             form: document.getElementById('chatForm'),
             input: document.getElementById('userInput'),
             sendBtn: document.getElementById('sendBtn'),
-            clearBtn: document.getElementById('clearBtn')
+            clearBtn: document.getElementById('clearBtn'),
+            sidebarPanel: document.getElementById('sidebarPanel'),
+            sidebarToggle: document.getElementById('sidebarToggle'),
+            newChatBtn: document.getElementById('newChatBtn'),
+            sessionHistoryList: document.getElementById('sessionHistoryList')
         };
 
         const imageInput = document.getElementById('imageInput');
@@ -153,7 +185,153 @@
         const removePdfBtn = document.getElementById('removePdfBtn');
         const pdfStatus = document.getElementById('pdfStatus');
 
-        // Check if send button should be enabled
+        // Target Global Session Storage Synchronizers
+        function loadSessionsFromLocalStorage() {
+            const rawSessions = localStorage.getItem('qwen_bot_sessions_vault');
+            if (rawSessions) {
+                chatSessionsRegistry = JSON.parse(rawSessions);
+            } else {
+                chatSessionsRegistry = {};
+            }
+            renderSidebarSessions();
+        }
+
+        function saveSessionsToLocalStorage() {
+            localStorage.setItem('qwen_bot_sessions_vault', JSON.stringify(chatSessionsRegistry));
+            renderSidebarSessions();
+        }
+
+        function renderSidebarSessions() {
+            DOM.sessionHistoryList.innerHTML = '';
+            const sortedKeys = Object.keys(chatSessionsRegistry).sort((a, b) => b - a); // Order chronologically
+
+            if (sortedKeys.length === 0) {
+                DOM.sessionHistoryList.innerHTML = `<div class="text-xs text-gray-600 italic text-center pt-4">No logged records.</div>`;
+                return;
+            }
+
+            sortedKeys.forEach(sessionId => {
+                const sessionData = chatSessionsRegistry[sessionId];
+                const itemRow = document.createElement('div');
+                const isActive = (sessionId === currentSessionId);
+                
+                itemRow.className = `group flex items-center justify-between w-full px-3 py-2 rounded-xl text-xs transition-all cursor-pointer ${
+                    isActive ? 'bg-[#2d2f34] text-white font-medium' : 'text-gray-400 hover:bg-[#1e1f20] hover:text-gray-200'
+                }`;
+                
+                // Truncated Display Item Context Hook Text Engine
+                const displayTitle = sessionData.title || "Context Dialogue";
+                
+                itemRow.innerHTML = `
+                    <div class="flex items-center gap-2 truncate flex-1 select-none pr-1">
+                        <i class="fas fa-comment-alt text-gray-500 group-hover:text-purple-400 transition-colors shrink-0"></i>
+                        <span class="truncate">${displayTitle}</span>
+                    </div>
+                    <button class="delete-session-btn opacity-0 group-hover:opacity-100 text-gray-500 hover:text-red-400 transition-opacity px-1 py-0.5" data-id="${sessionId}">
+                        <i class="fas fa-trash-alt text-[10px]"></i>
+                    </button>
+                `;
+
+                // Handle item load triggers
+                itemRow.addEventListener('click', (e) => {
+                    if (e.target.closest('.delete-session-btn')) return; // ignore delete action paths
+                    loadActiveChatSession(sessionId);
+                    // Hide panel drawer frame layout on mobile views following click
+                    DOM.sidebarPanel.classList.add('-translate-x-full');
+                });
+
+                // Attach contextual element hooks mapping to execution logs
+                const deleteBtn = itemRow.querySelector('.delete-session-btn');
+                deleteBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if (confirm("Delete this conversation path logs permanently?")) {
+                        deleteChatSession(sessionId);
+                    }
+                });
+
+                DOM.sessionHistoryList.appendChild(itemRow);
+            });
+        }
+
+        function loadActiveChatSession(sessionId) {
+            currentSessionId = sessionId;
+            chatHistory = chatSessionsRegistry[sessionId].history || [];
+            
+            // Re-read document attachments parsed under context indexes if applicable
+            extractedPdfText = chatSessionsRegistry[sessionId].associatedPdfText || "";
+            const attachedTitle = chatSessionsRegistry[sessionId].associatedPdfTitle || "";
+            
+            if (extractedPdfText && attachedTitle) {
+                setPdfInterfaceState(attachedTitle);
+            } else {
+                clearPdfUIState();
+            }
+
+            // Repopulate visual board elements layout
+            DOM.container.innerHTML = '';
+            if (chatHistory.length === 0) {
+                DOM.container.appendChild(DOM.welcome);
+                DOM.welcome.classList.remove('hidden');
+            } else {
+                DOM.welcome.classList.add('hidden');
+                chatHistory.forEach(msg => {
+                    // Adapt system structures checking if content component layout is multimodal
+                    let renderableText = "";
+                    if (Array.isArray(msg.content)) {
+                        const textObj = msg.content.find(item => item.type === "text");
+                        if (textObj) {
+                            // Trim down backend payload blocks showing internal references inside message history log rendering
+                            renderableText = textObj.text;
+                            if (renderableText.includes("[BACKGROUND CONTEXT FROM UPLOADED PDF DOCUMENT]")) {
+                                const indexMarker = renderableText.indexOf("[USER QUESTION / DIRECTION]:\n");
+                                if (indexMarker !== -1) {
+                                    renderableText = renderableText.substring(indexMarker + 29);
+                                }
+                            }
+                        }
+                    } else {
+                        renderableText = msg.content;
+                    }
+                    appendMessage(msg.role, renderableText);
+                });
+            }
+            renderSidebarSessions();
+        }
+
+        function deleteChatSession(sessionId) {
+            delete chatSessionsRegistry[sessionId];
+            if (currentSessionId === sessionId) {
+                currentSessionId = null;
+                chatHistory = [];
+                extractedPdfText = "";
+                clearPdfUIState();
+                DOM.container.innerHTML = '';
+                DOM.container.appendChild(DOM.welcome);
+                DOM.welcome.classList.remove('hidden');
+            }
+            saveSessionsToLocalStorage();
+        }
+
+        function initializeNewChatSession() {
+            currentSessionId = null;
+            chatHistory = [];
+            extractedPdfText = "";
+            clearPdfUIState();
+            DOM.container.innerHTML = '';
+            DOM.container.appendChild(DOM.welcome);
+            DOM.welcome.classList.remove('hidden');
+            renderSidebarSessions();
+        }
+
+        // Mobile responsive UI interactions
+        DOM.sidebarToggle.addEventListener('click', () => {
+            DOM.sidebarPanel.classList.toggle('-translate-x-full');
+        });
+
+        DOM.newChatBtn.addEventListener('click', () => {
+            initializeNewChatSession();
+        });
+
         function evaluateButtonStatus() {
             const hasText = DOM.input.value.trim().length > 0;
             const hasImage = selectedImageBase64 !== null;
@@ -167,22 +345,29 @@
             evaluateButtonStatus();
         });
 
-        // --- IMAGE ATTACHMENT CORE LOGIC ---
+        // Prompt presets macros engine interface hookup
+        document.querySelectorAll('.quick-action-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                DOM.input.value = button.getAttribute('data-prompt');
+                DOM.input.style.height = 'auto';
+                DOM.input.style.height = Math.min(DOM.input.scrollHeight, 200) + 'px';
+                evaluateButtonStatus();
+                DOM.input.focus();
+            });
+        });
+
+        // --- IMAGE LOADER LOGIC ---
         uploadImageBtn.addEventListener('click', () => imageInput.click());
         imageInput.addEventListener('change', (e) => {
             const file = e.target.files[0];
             if (!file) return;
-
-            // Clear any staged video first to avoid conflict
             stagedVideoUrl = null;
             videoPreviewIndicator.classList.add('hidden');
-
             const reader = new FileReader();
             reader.onload = (event) => {
                 selectedImageBase64 = event.target.result;
                 imagePreview.src = selectedImageBase64;
                 imagePreview.classList.remove('hidden');
-                
                 mediaTypeLabel.innerText = "Photo Selected (Album/Camera)";
                 mediaTypeLabel.className = "text-xs text-emerald-400 font-semibold";
                 mediaDetailLabel.innerText = file.name;
@@ -192,20 +377,16 @@
             reader.readAsDataURL(file);
         });
 
-        // --- VIDEO ATTACHMENT CORE LOGIC ---
+        // --- VIDEO LOADER LOGIC ---
         uploadVideoBtn.addEventListener('click', () => {
-            const url = prompt("Please paste your public video URL link (e.g. https://example.com/movie.mp4):");
+            const url = prompt("Please paste your public video URL link:");
             if (!url) return;
-
             if(!url.trim().startsWith("http")) {
                 alert("Please enter a valid web URL link starting with http:// or https://");
                 return;
             }
-
-            // Clear any staged image first
             selectedImageBase64 = null;
             imagePreview.classList.add('hidden');
-
             stagedVideoUrl = url.trim();
             videoPreviewIndicator.classList.remove('hidden');
             mediaTypeLabel.innerText = "Video URL Attached";
@@ -215,7 +396,6 @@
             evaluateButtonStatus();
         });
 
-        // Remove media attachment
         removeMediaBtn.addEventListener('click', () => {
             selectedImageBase64 = null;
             stagedVideoUrl = null;
@@ -226,12 +406,11 @@
             evaluateButtonStatus();
         });
 
-        // --- PDF KNOWLEDGE BASE CORE LOGIC ---
+        // --- PDF COMPONENT LOGIC ---
         uploadPdfBtn.addEventListener('click', () => pdfFileInput.click());
         pdfFileInput.addEventListener('change', async (e) => {
             const file = e.target.files[0];
             if (!file) return;
-
             pdfStatus.innerHTML = '<i class="fas fa-circle-notch fa-spin text-purple-400"></i> Parsing PDF context pages...';
             uploadPdfBtn.disabled = true;
 
@@ -248,23 +427,25 @@
                 }
 
                 const cleanedText = collectiveText.trim();
-                
-                // NEW DETECTOR: Catch Scanned PDFs before saving
                 if (cleanedText.length === 0) {
-                    alert("⚠️ WARNING: This PDF contains 0 readable text characters! It looks like a scanned image or photo textbook. The browser cannot read it. Please upload a digital PDF with selectable text.");
+                    alert("⚠️ WARNING: This PDF contains 0 readable text characters! Layout file could be image scan format.");
                     pdfStatus.innerText = "Failed: Scanned Document Detected";
                     return;
                 }
 
                 extractedPdfText = cleanedText;
-                localStorage.setItem('knowledge_pdf_content', extractedPdfText);
-                localStorage.setItem('knowledge_pdf_title', file.name);
-
                 setPdfInterfaceState(file.name);
+                
+                // Synchronize active files attachment into session state layout tracking logs
+                if (currentSessionId) {
+                    chatSessionsRegistry[currentSessionId].associatedPdfText = extractedPdfText;
+                    chatSessionsRegistry[currentSessionId].associatedPdfTitle = file.name;
+                    localStorage.setItem('qwen_bot_sessions_vault', JSON.stringify(chatSessionsRegistry));
+                }
 
             } catch (err) {
                 console.error(err);
-                alert("Could not process PDF. Please ensure it is a text-based document file and not an image scan.");
+                alert("Could not process PDF file.");
                 pdfStatus.innerText = "Error loading context file";
             } finally {
                 uploadPdfBtn.disabled = false;
@@ -273,14 +454,13 @@
         });
 
         removePdfBtn.addEventListener('click', () => {
-            localStorage.removeItem('knowledge_pdf_content');
-            localStorage.removeItem('knowledge_pdf_title');
             extractedPdfText = "";
-            
-            pdfStatus.innerText = "No PDF uploaded yet";
-            pdfStatus.className = "italic text-gray-500";
-            removePdfBtn.classList.replace('flex', 'hidden');
-            uploadPdfBtn.classList.replace('hidden', 'flex');
+            clearPdfUIState();
+            if (currentSessionId) {
+                chatSessionsRegistry[currentSessionId].associatedPdfText = "";
+                chatSessionsRegistry[currentSessionId].associatedPdfTitle = "";
+                localStorage.setItem('qwen_bot_sessions_vault', JSON.stringify(chatSessionsRegistry));
+            }
         });
 
         function setPdfInterfaceState(title) {
@@ -290,17 +470,13 @@
             removePdfBtn.classList.replace('hidden', 'flex');
         }
 
-        // On system configuration reload state check
-        window.addEventListener('DOMContentLoaded', () => {
-            const textCache = localStorage.getItem('knowledge_pdf_content');
-            const nameCache = localStorage.getItem('knowledge_pdf_title');
-            if (textCache && nameCache) {
-                extractedPdfText = textCache;
-                setPdfInterfaceState(nameCache);
-            }
-        });
+        function clearPdfUIState() {
+            pdfStatus.innerText = "No PDF uploaded yet";
+            pdfStatus.className = "italic text-gray-500";
+            removePdfBtn.classList.replace('flex', 'hidden');
+            uploadPdfBtn.classList.replace('hidden', 'flex');
+        }
 
-        // Keyboard Action Submissions
         DOM.input.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
@@ -309,10 +485,11 @@
         });
 
         DOM.clearBtn.addEventListener('click', () => {
-            chatHistory = [];
-            DOM.container.innerHTML = '';
-            DOM.container.appendChild(DOM.welcome);
-            DOM.welcome.classList.remove('hidden');
+            if (confirm("Are you sure you want to clear ALL chat history logs stored inside your web browser? This cannot be undone.")) {
+                localStorage.removeItem('qwen_bot_sessions_vault');
+                chatSessionsRegistry = {};
+                initializeNewChatSession();
+            }
         });
 
         function appendMessage(role, text) {
@@ -364,21 +541,30 @@
             const messageInputText = DOM.input.value.trim();
 
             if (!ALIYUN_API_KEY || ALIYUN_API_KEY === "PASTE_YOUR_API_KEY_HERE") {
-                alert("Error: Missing Configuration API Key on line 144!");
+                alert("Error: Missing Configuration API Key on line 193!");
                 return;
             }
 
-            // Build structural multi-modal payload format for OpenAI-compatible Qwen Vision
+            // Create new tracking session key index if workspace stream execution is fresh
+            if (!currentSessionId) {
+                currentSessionId = Date.now().toString();
+                let promptSnippet = messageInputText ? messageInputText.substring(0, 26) + "..." : "Multimodal Material Context Stream";
+                chatSessionsRegistry[currentSessionId] = {
+                    title: promptSnippet,
+                    history: [],
+                    associatedPdfText: extractedPdfText,
+                    associatedPdfTitle: extractedPdfText ? "Uploaded Context File" : ""
+                };
+            }
+
             let contentPayload = [];
             let visualChatDisplayMessage = messageInputText;
 
-            // NEW CORE CHANGE: Force the PDF context directly into the text stream so the Vision model cannot ignore it
             let processedPromptText = messageInputText;
             if (extractedPdfText) {
-                processedPromptText = `[BACKGROUND CONTEXT FROM UPLOADED PDF DOCUMENT]:\n${extractedPdfText}\n\n[USER QUESTION / DIRECTION]:\n${messageInputText || "Analyze the provided media context alongside the document references."}`;
+                processedPromptText = `[BACKGROUND CONTEXT FROM UPLOADED PDF DOCUMENT]:\n${extractedPdfText}\n\n[USER QUESTION / DIRECTION]:\n${messageInputText || "Analyze the provided material alongside document references."}`;
             }
 
-            // Handle Staged Image Data Injection
             if (selectedImageBase64) {
                 contentPayload.push({
                     "type": "image_url",
@@ -386,7 +572,6 @@
                 });
                 visualChatDisplayMessage = `<div class="flex items-center gap-2 mb-1.5 text-xs text-emerald-400 font-semibold"><i class="fas fa-camera"></i> Attached Photo Analyzed</div>` + (messageInputText || `<span class="italic text-gray-400">Inspecting uploaded image file...</span>`);
             } 
-            // Handle Staged Video URL Link Injection
             else if (stagedVideoUrl) {
                 contentPayload.push({
                     "type": "video",
@@ -395,7 +580,6 @@
                 visualChatDisplayMessage = `<div class="flex items-center gap-2 mb-1.5 text-xs text-blue-400 font-semibold"><i class="fas fa-video"></i> Streaming Web Video Reference</div><div class="text-[11px] text-gray-400 truncate mb-1 bg-[#1a1b1e] p-1 rounded border border-[#2d2f34] max-w-sm">${stagedVideoUrl}</div>` + (messageInputText || `<span class="italic text-gray-400">Processing video clip feeds...</span>`);
             }
 
-            // Append the optimized text string (carrying text questions + PDF references)
             if (processedPromptText || (!selectedImageBase64 && !stagedVideoUrl)) {
                 contentPayload.push({
                     "type": "text",
@@ -405,7 +589,6 @@
 
             appendMessage('user', visualChatDisplayMessage);
             
-            // Clean interface slate states
             DOM.input.value = '';
             DOM.input.style.height = 'auto';
             DOM.sendBtn.disabled = true;
@@ -415,7 +598,10 @@
                 chatHistory = chatHistory.slice(-MAX_HISTORY_MESSAGES);
             }
 
-            // Clear temporary flags out
+            // Sync structural parameters array instantly to local caching layers
+            chatSessionsRegistry[currentSessionId].history = chatHistory;
+            saveSessionsToLocalStorage();
+
             selectedImageBase64 = null;
             stagedVideoUrl = null;
             imageInput.value = '';
@@ -423,12 +609,15 @@
             videoPreviewIndicator.classList.add('hidden');
             mediaPreviewContainer.classList.replace('flex', 'hidden');
 
-            const aiNode = appendMessage('assistant', '<i class="fas fa-circle-notch fa-spin text-purple-400"></i> Scanning document data and inspecting streams...');
+            const aiNode = appendMessage('assistant', '<i class="fas fa-circle-notch fa-spin text-purple-400"></i> Parsing context data streams...');
 
             try {
                 let activePayloadPackage = [];
-                // Simple generic fallback baseline context instruction
-                activePayloadPackage.push({ role: "system", content: "You are an analytical assistant tracking mixed multimodal user elements across video feeds, images, and document context attachments." });
+                activePayloadPackage.push({ 
+                    role: "system", 
+                    content: "You are an analytical assistant tracking mixed multimodal user elements across video feeds, images, and document context attachments. CRITICAL RULE: If text is provided under '[BACKGROUND CONTEXT FROM UPLOADED PDF DOCUMENT]', the user's PDF text has already been successfully extracted and provided to you by the browser. Do NOT give a generic disclaimer saying you cannot read or process PDFs. You have the text right in front of you. Answer user questions directly using that text content." 
+                });
+                
                 activePayloadPackage.push(...chatHistory);
 
                 const serverResponseData = await fetchWithRetry(API_ENDPOINT, {
@@ -440,7 +629,7 @@
                     body: JSON.stringify({
                         model: QWEN_MODEL,
                         messages: activePayloadPackage,
-                        temperature: 0.4
+                        temperature: 0.3
                     })
                 });
 
@@ -449,15 +638,26 @@
                 Prism.highlightAllUnder(aiNode);
                 
                 chatHistory.push({ role: "assistant", content: botOutputStringText });
+                
+                // Update persistent logs with completed response strings
+                chatSessionsRegistry[currentSessionId].history = chatHistory;
+                saveSessionsToLocalStorage();
 
             } catch (err) {
                 console.error(err);
-                aiNode.innerHTML = `<span class="text-red-400"><i class="fas fa-exclamation-triangle mr-2"></i>Multimodal parsing transmission fault. Please ensure your API structural quotas are in order and key configurations match specifications.</span>`;
+                aiNode.innerHTML = `<span class="text-red-400"><i class="fas fa-exclamation-triangle mr-2"></i>Transmission fault. Please check key configuration structures or API limits.</span>`;
                 chatHistory.pop();
+                chatSessionsRegistry[currentSessionId].history = chatHistory;
+                saveSessionsToLocalStorage();
             } finally {
                 DOM.container.scrollIntoView({ behavior: 'smooth', block: 'end' });
                 evaluateButtonStatus();
             }
+        });
+
+        // Initialize state engine layout routines upon full window parsing completions
+        window.addEventListener('DOMContentLoaded', () => {
+            loadSessionsFromLocalStorage();
         });
     </script>
 </body>
