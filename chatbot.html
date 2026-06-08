@@ -247,7 +247,16 @@
                     collectiveText += pageStrings + "\n";
                 }
 
-                extractedPdfText = collectiveText.trim();
+                const cleanedText = collectiveText.trim();
+                
+                // NEW DETECTOR: Catch Scanned PDFs before saving
+                if (cleanedText.length === 0) {
+                    alert("⚠️ WARNING: This PDF contains 0 readable text characters! It looks like a scanned image or photo textbook. The browser cannot read it. Please upload a digital PDF with selectable text.");
+                    pdfStatus.innerText = "Failed: Scanned Document Detected";
+                    return;
+                }
+
+                extractedPdfText = cleanedText;
                 localStorage.setItem('knowledge_pdf_content', extractedPdfText);
                 localStorage.setItem('knowledge_pdf_title', file.name);
 
@@ -359,9 +368,15 @@
                 return;
             }
 
-            // Create payload structures
+            // Build structural multi-modal payload format for OpenAI-compatible Qwen Vision
             let contentPayload = [];
             let visualChatDisplayMessage = messageInputText;
+
+            // NEW CORE CHANGE: Force the PDF context directly into the text stream so the Vision model cannot ignore it
+            let processedPromptText = messageInputText;
+            if (extractedPdfText) {
+                processedPromptText = `[BACKGROUND CONTEXT FROM UPLOADED PDF DOCUMENT]:\n${extractedPdfText}\n\n[USER QUESTION / DIRECTION]:\n${messageInputText || "Analyze the provided media context alongside the document references."}`;
+            }
 
             // Handle Staged Image Data Injection
             if (selectedImageBase64) {
@@ -380,18 +395,12 @@
                 visualChatDisplayMessage = `<div class="flex items-center gap-2 mb-1.5 text-xs text-blue-400 font-semibold"><i class="fas fa-video"></i> Streaming Web Video Reference</div><div class="text-[11px] text-gray-400 truncate mb-1 bg-[#1a1b1e] p-1 rounded border border-[#2d2f34] max-w-sm">${stagedVideoUrl}</div>` + (messageInputText || `<span class="italic text-gray-400">Processing video clip feeds...</span>`);
             }
 
-            // Always add the textual request if it exists
-            if (messageInputText) {
+            // Append the optimized text string (carrying text questions + PDF references)
+            if (processedPromptText || (!selectedImageBase64 && !stagedVideoUrl)) {
                 contentPayload.push({
                     "type": "text",
-                    "text": messageInputText
+                    "text": processedPromptText || "Analyze the attached material."
                 });
-            } else if (!selectedImageBase64 && !stagedVideoUrl) {
-                return; // Nothing to transmit
-            } else if (selectedImageBase64 && !messageInputText) {
-                contentPayload.push({ "type": "text", text: "Describe and analyze this image in full structural detail." });
-            } else if (stagedVideoUrl && !messageInputText) {
-                contentPayload.push({ "type": "text", text: "Please detail what happens inside this linked video timeline reference." });
             }
 
             appendMessage('user', visualChatDisplayMessage);
@@ -414,18 +423,12 @@
             videoPreviewIndicator.classList.add('hidden');
             mediaPreviewContainer.classList.replace('flex', 'hidden');
 
-            const aiNode = appendMessage('assistant', '<i class="fas fa-circle-notch fa-spin text-purple-400"></i> Examining stream layers and referencing knowledge base...');
+            const aiNode = appendMessage('assistant', '<i class="fas fa-circle-notch fa-spin text-purple-400"></i> Scanning document data and inspecting streams...');
 
             try {
-                // Dynamically build and prepend system instruction including PDF Knowledge contexts
-                let systemInstructionPrompt = "You are an advanced AI companion assistant capable of understanding text, reading PDFs, and running deep contextual recognition patterns across image scenes and video data streams.";
-                
-                if (extractedPdfText) {
-                    systemInstructionPrompt += `\n\n[USER KNOWLEDGE BASE FILE ATTACHMENT]:\nThe following text extraction comes directly from a document provided explicitly by the user. Use this information as foundational background context truth to answer user queries with extreme accuracy:\n${extractedPdfText}`;
-                }
-
                 let activePayloadPackage = [];
-                activePayloadPackage.push({ role: "system", content: systemInstructionPrompt });
+                // Simple generic fallback baseline context instruction
+                activePayloadPackage.push({ role: "system", content: "You are an analytical assistant tracking mixed multimodal user elements across video feeds, images, and document context attachments." });
                 activePayloadPackage.push(...chatHistory);
 
                 const serverResponseData = await fetchWithRetry(API_ENDPOINT, {
