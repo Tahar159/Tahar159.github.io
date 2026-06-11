@@ -58,23 +58,6 @@
 
         <div class="flex-1 flex flex-col h-full overflow-hidden relative">
             
-            <div class="bg-[#16171a] border-b border-[#2d2f34] px-6 py-2.5 flex items-center justify-between text-xs text-gray-400 shrink-0">
-                <div class="flex items-center gap-2">
-                    <i class="fas fa-book-open text-purple-400 text-sm"></i>
-                    <span class="font-medium text-gray-300">Knowledge Page:</span>
-                    <span id="pdfStatus" class="italic text-gray-500">No PDF uploaded yet</span>
-                </div>
-                <div class="flex items-center gap-3">
-                    <input type="file" id="pdfFileInput" accept=".pdf" class="hidden">
-                    <button id="uploadPdfBtn" class="bg-[#2d2f34] hover:bg-[#3c3d42] text-white px-3 py-1 rounded-md transition-colors flex items-center gap-1.5 cursor-pointer">
-                        <i class="fas fa-file-pdf text-red-400"></i> Upload PDF
-                    </button>
-                    <button id="removePdfBtn" class="bg-red-950/40 hover:bg-red-900/60 text-red-400 px-3 py-1 rounded-md transition-colors hidden items-center gap-1.5 cursor-pointer">
-                        <i class="fas fa-trash"></i> Remove PDF
-                    </button>
-                </div>
-            </div>
-
             <main class="flex-1 overflow-y-auto px-4 py-6 md:px-0 flex flex-col items-center">
                 <div id="chatContainer" class="w-full max-w-3xl space-y-6 mb-36">
                     <div id="welcomeScreen" class="flex flex-col items-center justify-center text-center pt-16 px-4 space-y-4">
@@ -87,6 +70,17 @@
             <footer class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-[#111214] via-[#111214] to-transparent pt-4 pb-6 flex justify-center px-4 z-10 shrink-0">
                 <div class="w-full max-w-3xl relative flex flex-col items-center">
                     
+                    <div id="pdfStatusBadge" class="w-full hidden bg-[#1e1f20] px-4 py-2.5 mb-2 rounded-xl border border-[#3c3d42] justify-between items-center text-xs">
+                        <div class="flex items-center gap-2 truncate mr-4">
+                            <i class="fas fa-file-pdf text-red-400 text-sm flex-shrink-0"></i>
+                            <span class="text-gray-400 font-medium flex-shrink-0">Knowledge Base context:</span>
+                            <span id="pdfStatus" class="text-purple-400 font-bold tracking-wide truncate">No file parsed</span>
+                        </div>
+                        <button type="button" id="removePdfBtn" class="text-gray-500 hover:text-red-400 p-1 transition-colors flex-shrink-0" title="Remove PDF text background context">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </div>
+
                     <div id="mediaPreviewContainer" class="w-full hidden bg-[#1e1f20] p-3 mb-2 rounded-xl border border-[#3c3d42] justify-between items-center">
                         <div class="flex items-center gap-3">
                             <img id="imagePreview" class="h-14 w-14 rounded-lg object-cover border border-[#4b5563] hidden" src="" alt="Preview">
@@ -119,13 +113,19 @@
                     </div>
 
                     <form id="chatForm" class="w-full flex items-end bg-[#222327] border border-[#3c3d42] rounded-2xl px-4 py-3 shadow-2xl focus-within:border-gray-500 transition-colors">
-                        <div class="flex items-center gap-3 mr-2 pb-1">
+                        <div class="flex items-center gap-3.5 mr-2 pb-1">
                             <input type="file" id="imageInput" accept="image/*" class="hidden">
                             <button type="button" id="uploadImageBtn" class="text-gray-400 hover:text-emerald-400 transition-colors cursor-pointer" title="Take Photo or Album Upload">
                                 <i class="fas fa-camera text-xl"></i>
                             </button>
+                            
                             <button type="button" id="uploadVideoBtn" class="text-gray-400 hover:text-blue-400 transition-colors cursor-pointer" title="Analyze Remote Video URL">
                                 <i class="fas fa-video text-xl"></i>
+                            </button>
+
+                            <input type="file" id="pdfFileInput" accept=".pdf" class="hidden">
+                            <button type="button" id="uploadPdfBtn" class="text-gray-400 hover:text-red-400 transition-colors cursor-pointer" title="Upload Document File (.pdf)">
+                                <i class="fas fa-file-pdf text-xl"></i>
                             </button>
                         </div>
 
@@ -184,6 +184,7 @@
         const uploadPdfBtn = document.getElementById('uploadPdfBtn');
         const removePdfBtn = document.getElementById('removePdfBtn');
         const pdfStatus = document.getElementById('pdfStatus');
+        const pdfStatusBadge = document.getElementById('pdfStatusBadge');
 
         // Target Global Session Storage Synchronizers
         function loadSessionsFromLocalStorage() {
@@ -219,7 +220,6 @@
                     isActive ? 'bg-[#2d2f34] text-white font-medium' : 'text-gray-400 hover:bg-[#1e1f20] hover:text-gray-200'
                 }`;
                 
-                // Truncated Display Item Context Hook Text Engine
                 const displayTitle = sessionData.title || "Context Dialogue";
                 
                 itemRow.innerHTML = `
@@ -232,15 +232,12 @@
                     </button>
                 `;
 
-                // Handle item load triggers
                 itemRow.addEventListener('click', (e) => {
-                    if (e.target.closest('.delete-session-btn')) return; // ignore delete action paths
+                    if (e.target.closest('.delete-session-btn')) return; 
                     loadActiveChatSession(sessionId);
-                    // Hide panel drawer frame layout on mobile views following click
                     DOM.sidebarPanel.classList.add('-translate-x-full');
                 });
 
-                // Attach contextual element hooks mapping to execution logs
                 const deleteBtn = itemRow.querySelector('.delete-session-btn');
                 deleteBtn.addEventListener('click', (e) => {
                     e.stopPropagation();
@@ -257,7 +254,6 @@
             currentSessionId = sessionId;
             chatHistory = chatSessionsRegistry[sessionId].history || [];
             
-            // Re-read document attachments parsed under context indexes if applicable
             extractedPdfText = chatSessionsRegistry[sessionId].associatedPdfText || "";
             const attachedTitle = chatSessionsRegistry[sessionId].associatedPdfTitle || "";
             
@@ -267,7 +263,6 @@
                 clearPdfUIState();
             }
 
-            // Repopulate visual board elements layout
             DOM.container.innerHTML = '';
             if (chatHistory.length === 0) {
                 DOM.container.appendChild(DOM.welcome);
@@ -275,12 +270,10 @@
             } else {
                 DOM.welcome.classList.add('hidden');
                 chatHistory.forEach(msg => {
-                    // Adapt system structures checking if content component layout is multimodal
                     let renderableText = "";
                     if (Array.isArray(msg.content)) {
                         const textObj = msg.content.find(item => item.type === "text");
                         if (textObj) {
-                            // Trim down backend payload blocks showing internal references inside message history log rendering
                             renderableText = textObj.text;
                             if (renderableText.includes("[BACKGROUND CONTEXT FROM UPLOADED PDF DOCUMENT]")) {
                                 const indexMarker = renderableText.indexOf("[USER QUESTION / DIRECTION]:\n");
@@ -323,7 +316,6 @@
             renderSidebarSessions();
         }
 
-        // Mobile responsive UI interactions
         DOM.sidebarToggle.addEventListener('click', () => {
             DOM.sidebarPanel.classList.toggle('-translate-x-full');
         });
@@ -336,7 +328,8 @@
             const hasText = DOM.input.value.trim().length > 0;
             const hasImage = selectedImageBase64 !== null;
             const hasVideo = stagedVideoUrl !== null;
-            DOM.sendBtn.disabled = !(hasText || hasImage || hasVideo);
+            const hasPdf = extractedPdfText.length > 0;
+            DOM.sendBtn.disabled = !(hasText || hasImage || hasVideo || hasPdf);
         }
 
         DOM.input.addEventListener('input', function() {
@@ -345,7 +338,6 @@
             evaluateButtonStatus();
         });
 
-        // Prompt presets macros engine interface hookup
         document.querySelectorAll('.quick-action-btn').forEach(button => {
             button.addEventListener('click', () => {
                 DOM.input.value = button.getAttribute('data-prompt');
@@ -406,12 +398,14 @@
             evaluateButtonStatus();
         });
 
-        // --- PDF COMPONENT LOGIC ---
+        // --- CONSOLIDATED PDF BOTTOM ACTION CONTROLLER ENGINE ---
         uploadPdfBtn.addEventListener('click', () => pdfFileInput.click());
         pdfFileInput.addEventListener('change', async (e) => {
             const file = e.target.files[0];
             if (!file) return;
-            pdfStatus.innerHTML = '<i class="fas fa-circle-notch fa-spin text-purple-400"></i> Parsing PDF context pages...';
+            
+            pdfStatusBadge.classList.replace('hidden', 'flex');
+            pdfStatus.innerHTML = '<i class="fas fa-circle-notch fa-spin text-purple-400 mr-1"></i> Parsing system layers...';
             uploadPdfBtn.disabled = true;
 
             try {
@@ -428,15 +422,14 @@
 
                 const cleanedText = collectiveText.trim();
                 if (cleanedText.length === 0) {
-                    alert("⚠️ WARNING: This PDF contains 0 readable text characters! Layout file could be image scan format.");
-                    pdfStatus.innerText = "Failed: Scanned Document Detected";
+                    alert("⚠️ WARNING: Scanned document layout detected (0 textual characters parsed).");
+                    pdfStatus.innerText = "Error: Text unreadable";
                     return;
                 }
 
                 extractedPdfText = cleanedText;
                 setPdfInterfaceState(file.name);
                 
-                // Synchronize active files attachment into session state layout tracking logs
                 if (currentSessionId) {
                     chatSessionsRegistry[currentSessionId].associatedPdfText = extractedPdfText;
                     chatSessionsRegistry[currentSessionId].associatedPdfTitle = file.name;
@@ -446,10 +439,11 @@
             } catch (err) {
                 console.error(err);
                 alert("Could not process PDF file.");
-                pdfStatus.innerText = "Error loading context file";
+                clearPdfUIState();
             } finally {
                 uploadPdfBtn.disabled = false;
                 pdfFileInput.value = '';
+                evaluateButtonStatus();
             }
         });
 
@@ -461,21 +455,17 @@
                 chatSessionsRegistry[currentSessionId].associatedPdfTitle = "";
                 localStorage.setItem('qwen_bot_sessions_vault', JSON.stringify(chatSessionsRegistry));
             }
+            evaluateButtonStatus();
         });
 
-        // UPDATED ASSISTANT SYSTEM INSTRUCTIONS TO REFLECT BRAND NAME
         function setPdfInterfaceState(title) {
-            pdfStatus.innerText = `Active Context: ${title}`;
-            pdfStatus.className = "text-purple-400 font-bold tracking-wide animate-pulse";
-            uploadPdfBtn.classList.replace('flex', 'hidden');
-            removePdfBtn.classList.replace('hidden', 'flex');
+            pdfStatus.innerText = title;
+            pdfStatusBadge.classList.replace('hidden', 'flex');
         }
 
         function clearPdfUIState() {
-            pdfStatus.innerText = "No PDF uploaded yet";
-            pdfStatus.className = "italic text-gray-500";
-            removePdfBtn.classList.replace('flex', 'hidden');
-            uploadPdfBtn.classList.replace('hidden', 'flex');
+            pdfStatus.innerText = "No file parsed";
+            pdfStatusBadge.classList.replace('flex', 'hidden');
         }
 
         DOM.input.addEventListener('keydown', (e) => {
@@ -546,7 +536,6 @@
                 return;
             }
 
-            // Create new tracking session key index if workspace stream execution is fresh
             if (!currentSessionId) {
                 currentSessionId = Date.now().toString();
                 let promptSnippet = messageInputText ? messageInputText.substring(0, 26) + "..." : "Multimodal Material Context Stream";
@@ -599,7 +588,6 @@
                 chatHistory = chatHistory.slice(-MAX_HISTORY_MESSAGES);
             }
 
-            // Sync structural parameters array instantly to local caching layers
             chatSessionsRegistry[currentSessionId].history = chatHistory;
             saveSessionsToLocalStorage();
 
@@ -640,7 +628,6 @@
                 
                 chatHistory.push({ role: "assistant", content: botOutputStringText });
                 
-                // Update persistent logs with completed response strings
                 chatSessionsRegistry[currentSessionId].history = chatHistory;
                 saveSessionsToLocalStorage();
 
@@ -656,7 +643,6 @@
             }
         });
 
-        // Initialize state engine layout routines upon full window parsing completions
         window.addEventListener('DOMContentLoaded', () => {
             loadSessionsFromLocalStorage();
         });
