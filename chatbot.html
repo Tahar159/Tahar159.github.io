@@ -71,7 +71,7 @@
                 </div>
                 <div>
                     <h1 class="text-sm font-bold tracking-wider text-white">TAHAR CHATBOT</h1>
-                    <p class="text-[10px] text-slate-400 font-medium">v2.5 Full Multi-Agent Suite</p>
+                    <p class="text-[10px] text-slate-400 font-medium">v2.6 Multi-Engine Stable</p>
                 </div>
             </div>
 
@@ -115,23 +115,23 @@
                 </div>
                 <div class="space-y-2">
                     <h2 class="text-2xl font-bold text-white tracking-tight">Welcome Back, Tahar</h2>
-                    <p class="text-xs text-slate-400 max-w-sm mx-auto leading-relaxed">Your professional environment is loaded. Upload PDFs, parse image vectors, scrape remote links, or execute custom Python code architectures instantly.</p>
+                    <p class="text-xs text-slate-400 max-w-sm mx-auto leading-relaxed">Your professional environment is loaded. Upload PDFs, parse images, scrape remote links, or format Python code architectures instantly.</p>
                 </div>
             </div>
         </div>
 
-        <div class="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-#0b0f19 via-#0b0f19/95 to-transparent z-10">
+        <div class="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-[#0b0f19] via-[#0b0f19]/95 to-transparent z-10">
             <div class="max-w-3xl mx-auto">
                 <div id="attachment-preview-tray" class="hidden flex flex-wrap items-center justify-between gap-2 mb-3 p-3 bg-slate-950/90 rounded-xl border border-slate-800 text-xs"></div>
 
                 <div class="bg-slate-900/90 border border-slate-800 rounded-2xl shadow-2xl p-2.5 transition-all focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-950/40 backdrop-blur-md">
                     <div class="flex items-end gap-2">
-                        <button onclick="document.getElementById('file-injector').click()" class="p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-xl transition flex-shrink-0">
+                        <button onclick="document.getElementById('file-injector').click()" class="p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-xl transition flex-shrink-0" title="Attach Image or PDF">
                             📎
                         </button>
                         <input type="file" id="file-injector" accept="image/*, application/pdf" class="hidden" onchange="handleFileInjection(event)">
 
-                        <button onclick="toggleUrlScraperPrompt()" class="p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-xl transition flex-shrink-0">
+                        <button onclick="toggleUrlScraperPrompt()" class="p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-xl transition flex-shrink-0" title="Scrape Web URL">
                             🌐
                         </button>
 
@@ -149,8 +149,8 @@
     <script>
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
 
+        // SET YOUR API KEY HERE
         const ALIYUN_API_KEY = "sk-c31927ba9ecd492d99830c199d06a5ec"; 
-        const ALIYUN_ENDPOINT = "https://dashscope.aliyuncs.com/api/v1/services/aigc/text-generation/generation";
 
         let activeChatId = 'session_default';
         let chatSessions = JSON.parse(localStorage.getItem('tahar_sessions')) || {};
@@ -268,51 +268,70 @@
             const welcomeMsg = document.getElementById('welcome-message');
             if (welcomeMsg) welcomeMsg.remove();
 
-            let userDisplayMessage = textQuery || `Triggered Context Pipeline Task: ${activeMediaContext.fileName || activeMediaContext.scrapedUrl}`;
+            let userDisplayMessage = textQuery || `Uploaded: ${activeMediaContext.fileName || activeMediaContext.scrapedUrl}`;
 
-            // FIXED STRING SYNTAX TO MATCH OLD PIPELINE
+            // Store cleanly in our local history state
+            let internalSavedContent = textQuery;
             if (activeMediaContext.type === 'pdf') {
-                textQuery = `[Context Document: ${activeMediaContext.fileName}]\n${activeMediaContext.extractedText}\n\nUser Question:\n${textQuery}`;
+                internalSavedContent = `[Context Document: ${activeMediaContext.fileName}]\n${activeMediaContext.extractedText}\n\nUser Question:\n${textQuery}`;
             } else if (activeMediaContext.type === 'url') {
-                textQuery = `[External Scraper Target Route: ${activeMediaContext.scrapedUrl}]\n\nUser Directive Task Query:\n${textQuery}`;
+                internalSavedContent = `[External Scraper Target Route: ${activeMediaContext.scrapedUrl}]\n\nUser Directive Task Query:\n${textQuery}`;
+            } else if (activeMediaContext.type === 'image') {
+                internalSavedContent = `[Attached Image: ${activeMediaContext.fileName}]\n${textQuery || "Analyze this image."}`;
             }
 
             appendBubbleToDisplay(userDisplayMessage, true);
             
-            chatSessions[activeChatId].push({ role: "user", content: textQuery });
+            chatSessions[activeChatId].push({ role: "user", content: internalSavedContent });
             saveAppStateToStorage();
 
             promptInput.value = "";
             promptInput.style.height = "auto";
             
             const streamBubbleId = "ai-stream-" + Date.now();
-            const responseWindow = appendBubbleToDisplay("Processing tokens vector arrays...", false, streamBubbleId);
+            const responseWindow = appendBubbleToDisplay("Processing system tokens...", false, streamBubbleId);
             
             const cachedMedia = { ...activeMediaContext };
             clearFileAttachment();
 
             try {
                 let modelTarget = "qwen-plus";
-                let promptPayloadContent = textQuery;
+                let activeEndpointRoute = "https://dashscope.aliyuncs.com/api/v1/services/aigc/text-generation/generation";
+                let messagesPayload = [];
 
+                const systemMessage = {
+                    role: "system",
+                    content: "You are Tahar Chatbot, an expert software architecture instructor. Always format Python code inside markdown code blocks (```python ... ```) with clear comments."
+                };
+
+                // BUILD CLEAN CLEAN HISTORY WITHOUT CROSSING TYPE PATHS
                 if (cachedMedia.type === 'image') {
                     modelTarget = "qwen-vl-plus";
-                    promptPayloadContent = [
-                        { image: `data:image/jpeg;base64,${cachedMedia.base64}` },
-                        { text: textQuery || "Analyze this image payload content." }
-                    ];
+                    activeEndpointRoute = "https://dashscope.aliyuncs.com/api/v1/services/aigc/multimodal-generation/generation";
+                    
+                    messagesPayload.push(systemMessage);
+                    
+                    // Convert old messages to compatible multimodal arrays if needed, or send pure current view
+                    chatSessions[activeChatId].slice(-6, -1).forEach(msg => {
+                        messagesPayload.push({ role: msg.role, content: [{ text: msg.content }] });
+                    });
+
+                    messagesPayload.push({
+                        role: "user",
+                        content: [
+                            { image: `data:image/jpeg;base64,${cachedMedia.base64}` },
+                            { text: textQuery || "Analyze this image content." }
+                        ]
+                    });
+                } else {
+                    // Standard text pipeline mapping
+                    messagesPayload.push(systemMessage);
+                    chatSessions[activeChatId].slice(-8).forEach(msg => {
+                        messagesPayload.push({ role: msg.role, content: msg.content });
+                    });
                 }
 
-                const messagesPayload = [
-                    {
-                        role: "system",
-                        content: "You are Tahar Chatbot, an expert software architecture instructor. You are tasked with reading, parsing, configuring, creating, debugging, and explaining Python programming code structures. Always format Python expressions inside markdown code blocks (```python ... ```) and add thorough inline comments inside the block arrays describing structural actions."
-                    },
-                    ...chatSessions[activeChatId].slice(-8, -1),
-                    { role: "user", content: promptPayloadContent }
-                ];
-
-                const apiResponse = await fetch(ALIYUN_ENDPOINT, {
+                const apiResponse = await fetch(activeEndpointRoute, {
                     method: "POST",
                     headers: {
                         "Authorization": `Bearer ${ALIYUN_API_KEY}`,
@@ -325,7 +344,7 @@
                     })
                 });
 
-                if (!apiResponse.ok) throw new Error(`API Gateway Error State: ${apiResponse.status}`);
+                if (!apiResponse.ok) throw new Error(`API Gateway Response Failure Status: ${apiResponse.status}`);
                 
                 const dataJson = await apiResponse.json();
                 const responseOutputText = dataJson.output.choices[0].message.content;
@@ -338,7 +357,7 @@
 
             } catch (error) {
                 console.error(error);
-                responseWindow.innerHTML = `<span class="text-red-400 font-semibold text-xs border border-red-900/30 bg-red-950/20 px-3 py-2 rounded-xl block">System Pipeline Exception Encountered: ${error.message}</span>`;
+                responseWindow.innerHTML = `<span class="text-red-400 font-semibold text-xs border border-red-900/30 bg-red-950/20 px-3 py-2 rounded-xl block">System Pipeline Exception: ${error.message}</span>`;
             }
         }
 
@@ -424,6 +443,7 @@
                 if (textHistory) {
                     if (textHistory.content.startsWith('[Context Document:')) snippet = "📄 Analyzed PDF Document";
                     else if (textHistory.content.startsWith('[External Scraper')) snippet = "🌐 Scraped Target Content";
+                    else if (textHistory.content.startsWith('[Attached Image:')) snippet = "🖼️ Processed Visual Asset";
                     else snippet = textHistory.content.substring(0, 22) + "...";
                 }
                 
@@ -451,7 +471,6 @@
             reloadChatScreen();
         }
 
-        // FIXED TEXT SPLITTING FORMAT TO LOAD LOGS PROPERLY
         function reloadChatScreen() {
             const displayWindow = document.getElementById('chat-window');
             displayWindow.innerHTML = "";
@@ -461,11 +480,11 @@
                 displayWindow.innerHTML = `
                     <div id="welcome-message" class="max-w-xl mx-auto text-center py-20 space-y-5">
                         <div class="h-14 w-14 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center mx-auto shadow-xl shadow-blue-500/10">
-                            <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 21l8.982-11.73a.75.75 0 00-.57-1.306h-5.962l.813-5.096L4 14.615h5.962z"></path>
+                            <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 21l8.982-11.73a.75.75 0 00-.57-1.306h-5.962l.813-5.096L4 14.615h5.962z"></path></svg>
                         </div>
                         <div class="space-y-2">
                             <h2 class="text-2xl font-bold text-white tracking-tight">Welcome Back, Tahar</h2>
-                            <p class="text-xs text-slate-400 max-w-sm mx-auto leading-relaxed">Your professional environment is loaded. Upload PDFs, parse image vectors, scrape remote links, or execute custom Python code architectures instantly.</p>
+                            <p class="text-xs text-slate-400 max-w-sm mx-auto leading-relaxed">Your professional environment is loaded. Upload PDFs, parse images, scrape remote links, or format Python code architectures instantly.</p>
                         </div>
                     </div>`;
                 return;
@@ -478,7 +497,10 @@
                     cleanText = lines.length > 1 ? lines[1] : "Analyzing Document Context...";
                 } else if (message.content.startsWith('[External Scraper')) {
                     const lines = message.content.split('\n\nUser Directive Task Query:\n');
-                    cleanText = lines.length > 1 ? lines[1] : "Analyzing Scraped Target Web Route...";
+                    cleanText = lines.length > 1 ? lines[1] : "Analyzing Scraped Target Content...";
+                } else if (message.content.startsWith('[Attached Image:')) {
+                    const lines = message.content.split(']\n');
+                    cleanText = lines.length > 1 ? lines[1] : "Analyzing Visual Content...";
                 }
                 appendBubbleToDisplay(cleanText, message.role === 'user');
             });
