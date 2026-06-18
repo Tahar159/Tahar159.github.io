@@ -94,7 +94,6 @@
     </div>
 
     <script>
-        // Setup PDF.js Worker path dynamically
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
 
         // PLACE YOUR ALIYUN API KEY RIGHT HERE
@@ -106,18 +105,16 @@
         let chatSessions = JSON.parse(localStorage.getItem('tahar_sessions')) || {};
         let activeMediaContext = { type: null, base64: null, extractedText: null, fileName: "" };
 
-        // Configure Marked markdown interpreter to use Prism syntax highlighting 
+        // Configure Marked to use Prism syntax highlighting 
         marked.setOptions({
             highlight: function (code, lang) {
                 if (lang && Prism.languages[lang]) {
                     return Prism.highlight(code, Prism.languages[lang], lang);
                 }
-                // Default fallback to Python color styling if not specified
                 return Prism.highlight(code, Prism.languages['python'], 'python');
             }
         });
 
-        // App Initializer Setup
         window.addEventListener('DOMContentLoaded', () => {
             if (!chatSessions[activeChatId]) {
                 chatSessions[activeChatId] = [];
@@ -138,7 +135,7 @@
             }
         }
 
-        // Context File Processing Engine (Images & PDFs)
+        // Context File Processing Engine (FIXED)
         function handleFileInjection(e) {
             const file = e.target.files[0];
             if (!file) return;
@@ -158,7 +155,7 @@
                 reader.onload = function(event) {
                     const typedarray = new Uint8Array(event.target.result);
                     pdfjsLib.getDocument(typedarray).promise.then(pdf => {
-                        let maxPages = Math.min(pdf.numPages, 10); // Performance safeguard cap
+                        let maxPages = Math.min(pdf.numPages, 10);
                         let countPromises = [];
                         for (let i = 1; i <= maxPages; i++) {
                             countPromises.push(pdf.getPage(i).then(page => page.getTextContent().then(text => text.items.map(s => s.str).join(' '))));
@@ -186,7 +183,6 @@
             document.getElementById('file-injector').value = "";
         }
 
-        // Quick Macro Processor System
         function triggerMacro(type) {
             const promptBox = document.getElementById('user-prompt');
             if (type === 'docs') {
@@ -200,37 +196,38 @@
             autoGrowTextarea(promptBox);
         }
 
-        // Message Dispatch Pipeline Call
+        // Message Dispatch Pipeline Call (FIXED PIECE HERE)
         async function dispatchMessage() {
             const promptInput = document.getElementById('user-prompt');
             let textQuery = promptInput.value.trim();
-            if (!textQuery && !activeMediaContext.base64) return;
+            
+            // FIXED condition: checking textQuery OR base64 OR extracted PDF text
+            if (!textQuery && !activeMediaContext.base64 && !activeMediaContext.extractedText) return;
 
-            // Remove welcome panel view immediately if present
             const welcomeMsg = document.getElementById('welcome-message');
             if (welcomeMsg) welcomeMsg.remove();
 
-            // Append PDF Context text seamlessly to user query if parsing document context
+            // Store clean display text for user bubble before appending context chunks
+            let userDisplayMessage = textQuery || `Uploaded File: ${activeMediaContext.fileName}`;
+
+            // Append PDF Context text seamlessly to history array
             if (activeMediaContext.type === 'pdf') {
-                textQuery = `[Attached PDF Document Data: ${activeMediaContext.fileName}]\n${activeMediaContext.extractedText}\n\nUser Message:\n${textQuery}`;
+                textQuery = `[Context Document: ${activeMediaContext.fileName}]\n${activeMediaContext.extractedText}\n\nUser Question:\n${textQuery}`;
             }
 
-            // Display your user question bubble onto layout screen
-            appendBubbleToDisplay(textQuery || `Uploaded File Media Context: ${activeMediaContext.fileName}`, true);
+            // Display clear question bubble on screen
+            appendBubbleToDisplay(userDisplayMessage, true);
             
             // Push item data to local history tracking
             chatSessions[activeChatId].push({ role: "user", content: textQuery });
             saveAppStateToStorage();
 
-            // Clear text entry bar safely
             promptInput.value = "";
             promptInput.style.height = "auto";
             
-            // Create a pending streaming response container
             const streamBubbleId = "ai-stream-" + Date.now();
             const responseWindow = appendBubbleToDisplay("Thinking deeply...", false, streamBubbleId);
             
-            // Local context reference caching 
             const cachedMedia = { ...activeMediaContext };
             clearFileAttachment();
 
@@ -238,7 +235,7 @@
                 let modelTarget = "qwen-plus";
                 let promptPayloadContent = textQuery;
 
-                // Toggle multimodal image analyzer mode if active base64 file data exists
+                // FIXED: Set up proper multimodal array format for image inputs
                 if (cachedMedia.type === 'image') {
                     modelTarget = "qwen-vl-plus";
                     promptPayloadContent = [
@@ -253,7 +250,8 @@
                         role: "system",
                         content: "You are Tahar Chatbot, an expert programming instructor and advanced development companion. You excel at reading, creating, explaining, and troubleshooting Python code. Always format Python blocks correctly inside markdown tags (```python ... ```) and add clean, readable comments inside the scripts to explain how the code works."
                     },
-                    ...chatSessions[activeChatId].slice(-6) // Moving history viewport context length
+                    ...chatSessions[activeChatId].slice(-6, -1), // Get previous history items
+                    { role: "user", content: promptPayloadContent } // Inject correctly formatted payload
                 ];
 
                 const apiResponse = await fetch(ALIYUN_ENDPOINT, {
@@ -269,26 +267,23 @@
                     })
                 });
 
-                if (!apiResponse.ok) throw new Error(`API Connection Exception Error Code: ${apiResponse.status}`);
+                if (!apiResponse.ok) throw new Error(`API Connection Error Code: ${apiResponse.status}`);
                 
                 const dataJson = await apiResponse.json();
                 const responseOutputText = dataJson.output.choices[0].message.content;
 
-                // Render finalized content with full prism text enhancements
                 updateAIBubbleWithData(responseWindow, responseOutputText);
                 
-                // Track into local history registry
                 chatSessions[activeChatId].push({ role: "assistant", content: responseOutputText });
                 saveAppStateToStorage();
                 renderSidebarHistory();
 
             } catch (error) {
                 console.error(error);
-                responseWindow.innerHTML = `<span class="text-red-400 font-semibold">Engine Connection Disruption: ${error.message}. Double-check your Aliyun API Key entry on Line 214 of this code file.</span>`;
+                responseWindow.innerHTML = `<span class="text-red-400 font-semibold">Engine Connection Disruption: ${error.message}. Double-check your Aliyun API Key entry on Line 131.</span>`;
             }
         }
 
-        // Render standard chat bubbles nodes onto the layout wrapper
         function appendBubbleToDisplay(text, isUser, forcedId = null) {
             const scrollContainer = document.getElementById('chat-window');
             const rowWrapper = document.createElement('div');
@@ -321,7 +316,6 @@
             document.getElementById('chat-window').scrollTop = document.getElementById('chat-window').scrollHeight;
         }
 
-        // Advanced Code Container Utilities (Highlighting injector hooks & floating Copy Button trigger)
         function attachCodeProcessingUtilities(mountNode) {
             mountNode.querySelectorAll('pre').forEach((preContainer) => {
                 preContainer.classList.add('relative', 'group', 'my-3', 'rounded-xl', 'p-4', 'bg-gray-950', 'border', 'border-gray-800');
@@ -331,7 +325,6 @@
                     targetCodeElement.classList.add('language-python');
                 }
 
-                // Build a modern hover-visible "Copy" action link button
                 const clipBoardButton = document.createElement('button');
                 clipBoardButton.className = "absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-all bg-gray-800 hover:bg-gray-700 text-gray-300 font-semibold text-[11px] px-2.5 py-1 rounded-md border border-gray-700 select-none";
                 clipBoardButton.innerText = "Copy";
@@ -351,7 +344,6 @@
                 preContainer.appendChild(clipBoardButton);
             });
 
-            // Re-fire Prism layout parser engine across new items
             Prism.highlightAllUnder(mountNode);
         }
 
@@ -369,7 +361,15 @@
                 
                 const labelText = document.createElement('span');
                 const textHistory = chatSessions[id].find(m => m.role === 'user');
-                labelText.innerText = textHistory ? textHistory.content.substring(0, 22) + "..." : "⚡ Empty Project Workspace";
+                
+                let snippet = "⚡ Empty Project Workspace";
+                if (textHistory) {
+                    snippet = textHistory.content.startsWith('[Context Document:') 
+                        ? "📄 PDF Context Task"
+                        : textHistory.content.substring(0, 22) + "...";
+                }
+                
+                labelText.innerText = snippet;
                 labelText.className = "truncate flex-1 pointer-events-none";
                 
                 elementRow.appendChild(labelText);
@@ -408,7 +408,13 @@
             }
 
             logsArray.forEach(message => {
-                appendBubbleToDisplay(message.content, message.role === 'user');
+                // If the stored string contains full PDF data chunking, format display look cleaner
+                let cleanText = message.content;
+                if (message.content.startsWith('[Context Document:')) {
+                    const lines = message.content.split('\n\nUser Question:\n');
+                    cleanText = lines.length > 1 ? lines[1] : "Analyzing PDF Document Setup...";
+                }
+                appendBubbleToDisplay(cleanText, message.role === 'user');
             });
         }
 
