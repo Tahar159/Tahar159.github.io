@@ -21,28 +21,16 @@
             background-color: #0b0f19;
         }
 
-        /* Custom Scrollbar Styles */
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #0f172a;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #334155;
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #475569;
-        }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
 
-        /* Glassmorphism Classes */
         .glass-panel {
             background: rgba(15, 23, 42, 0.65);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
-            border: 1px border rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.05);
         }
 
         .glass-sidebar {
@@ -51,7 +39,6 @@
             -webkit-backdrop-filter: blur(16px);
         }
 
-        /* Markdown Styles */
         .prose pre {
             background-color: #030712 !important;
             border: 1px solid #1e293b !important;
@@ -65,31 +52,13 @@
             font-size: 0.875rem;
             color: #f3f4f6;
         }
-        .prose p {
-            margin-bottom: 1rem;
-            line-height: 1.625;
-            color: #cbd5e1;
-        }
-        .prose h1, .prose h2, .prose h3 {
-            color: #ffffff;
-            font-weight: 600;
-            margin-top: 1.5rem;
-            margin-bottom: 0.5rem;
-        }
+        .prose p { margin-bottom: 1rem; line-height: 1.625; color: #cbd5e1; }
+        .prose h1, .prose h2, .prose h3 { color: #ffffff; font-weight: 600; margin-top: 1.5rem; margin-bottom: 0.5rem; }
         .prose h1 { font-size: 1.5rem; }
         .prose h2 { font-size: 1.25rem; }
-        .prose ul, .prose ol {
-            margin-left: 1.5rem;
-            margin-bottom: 1rem;
-            list-style-type: disk;
-        }
-        .prose li {
-            margin-bottom: 0.25rem;
-        }
-        pre code {
-            white-space: pre-wrap !important;
-            word-break: break-all !important;
-        }
+        .prose ul, .prose ol { margin-left: 1.5rem; margin-bottom: 1rem; list-style-type: disc; }
+        .prose li { margin-bottom: 0.25rem; }
+        pre code { white-space: pre-wrap !important; word-break: break-all !important; }
     </style>
 </head>
 <body class="text-gray-100 h-screen flex overflow-hidden">
@@ -107,7 +76,6 @@
             </div>
 
             <button onclick="createNewChat()" class="w-full py-2.5 px-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 transition-all rounded-xl text-sm font-semibold flex items-center justify-center gap-2 mb-6 shadow-md shadow-blue-900/20 active:scale-[0.98]">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"></path></svg>
                 New Conversation
             </button>
             
@@ -120,7 +88,6 @@
                 <span class="text-[11px] text-emerald-400 font-semibold bg-emerald-950/50 border border-emerald-800/30 px-2 py-0.5 rounded-full">Online</span>
             </div>
             <button onclick="clearAllHistory()" class="w-full py-2 px-3 bg-red-950/40 text-red-400 hover:bg-red-950/80 transition rounded-xl text-xs font-medium border border-red-900/30 flex items-center justify-center gap-2">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.34 7m-4.72 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"></path></svg>
                 Wipe Local Chat Data
             </button>
         </div>
@@ -135,15 +102,9 @@
             </div>
             
             <div class="flex gap-2" id="macro-container">
-                <button onclick="triggerMacro('docs')" class="text-xs font-medium bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700/50 px-3 py-1.5 rounded-xl transition text-slate-200 flex items-center gap-1.5">
-                    📖 Read Aliyun Docs
-                </button>
-                <button onclick="triggerMacro('research')" class="text-xs font-medium bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700/50 px-3 py-1.5 rounded-xl transition text-slate-200 flex items-center gap-1.5">
-                    🔬 Deep Research Guide
-                </button>
-                <button onclick="triggerMacro('expert')" class="text-xs font-medium bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700/50 px-3 py-1.5 rounded-xl transition text-slate-200 flex items-center gap-1.5">
-                    🧙‍♂️ Ask Aliyun Expert
-                </button>
+                <button onclick="triggerMacro('docs')" class="text-xs font-medium bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700/50 px-3 py-1.5 rounded-xl transition text-slate-200 flex items-center gap-1.5">📖 Read Aliyun Docs</button>
+                <button onclick="triggerMacro('research')" class="text-xs font-medium bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700/50 px-3 py-1.5 rounded-xl transition text-slate-200 flex items-center gap-1.5">🔬 Deep Research Guide</button>
+                <button onclick="triggerMacro('expert')" class="text-xs font-medium bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700/50 px-3 py-1.5 rounded-xl transition text-slate-200 flex items-center gap-1.5">🧙‍♂️ Ask Aliyun Expert</button>
             </div>
         </header>
 
@@ -159,48 +120,42 @@
             </div>
         </div>
 
-        <div class="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from(#0b0f19) via(#0b0f19)/95 to-transparent z-10">
+        <div class="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-#0b0f19 via-#0b0f19/95 to-transparent z-10">
             <div class="max-w-3xl mx-auto">
-                
                 <div id="attachment-preview-tray" class="hidden flex flex-wrap items-center justify-between gap-2 mb-3 p-3 bg-slate-950/90 rounded-xl border border-slate-800 text-xs"></div>
 
                 <div class="bg-slate-900/90 border border-slate-800 rounded-2xl shadow-2xl p-2.5 transition-all focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-950/40 backdrop-blur-md">
                     <div class="flex items-end gap-2">
-                        
-                        <button onclick="document.getElementById('file-injector').click()" class="p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-xl transition flex-shrink-0" title="Inject Local Image or PDF File Memory Context">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path></svg>
+                        <button onclick="document.getElementById('file-injector').click()" class="p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-xl transition flex-shrink-0">
+                            📎
                         </button>
                         <input type="file" id="file-injector" accept="image/*, application/pdf" class="hidden" onchange="handleFileInjection(event)">
 
-                        <button onclick="toggleUrlScraperPrompt()" class="p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-xl transition flex-shrink-0" title="Scrape Remote URL Content">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244"></path></svg>
+                        <button onclick="toggleUrlScraperPrompt()" class="p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-xl transition flex-shrink-0">
+                            🌐
                         </button>
 
                         <textarea id="user-prompt" rows="1" placeholder="Type messages, paste target URLs, or pass custom Python blocks..." class="w-full bg-transparent text-slate-100 placeholder-slate-500 focus:outline-none resize-none py-2 px-1 max-h-48 text-sm leading-relaxed" oninput="autoGrowTextarea(this)" onkeydown="handleKeyPress(event)"></textarea>
 
                         <button onclick="dispatchMessage()" id="send-button" class="p-2.5 bg-blue-600 hover:bg-blue-500 active:scale-95 transition-all text-white rounded-xl font-bold flex-shrink-0 shadow-lg shadow-blue-600/20">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5"></path></svg>
+                            ➔
                         </button>
                     </div>
                 </div>
             </div>
         </div>
-
     </div>
 
     <script>
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
 
-        // KEY ASSIGNMENT BLOCK
         const ALIYUN_API_KEY = "sk-c31927ba9ecd492d99830c199d06a5ec"; 
         const ALIYUN_ENDPOINT = "https://dashscope.aliyuncs.com/api/v1/services/aigc/text-generation/generation";
 
-        // Memory Registers
         let activeChatId = 'session_default';
         let chatSessions = JSON.parse(localStorage.getItem('tahar_sessions')) || {};
         let activeMediaContext = { type: null, base64: null, extractedText: null, fileName: "", scrapedUrl: "" };
 
-        // Prism Highlighter Code Config
         marked.setOptions({
             highlight: function (code, lang) {
                 if (lang && Prism.languages[lang]) {
@@ -230,17 +185,14 @@
             }
         }
 
-        // Web Scraper Overlay Prompters Controls (Restored from old version)
         function toggleUrlScraperPrompt() {
             const targetUrl = prompt("Enter target web address route URL to parse context manually:");
             if (!targetUrl) return;
-            
             activeMediaContext.type = 'url';
             activeMediaContext.scrapedUrl = targetUrl;
             showAttachmentPreview(`🌐 External Target Pointer Loaded: ${targetUrl}`);
         }
 
-        // Local Document and Multimodal Byte Stream File Ingestion Pipeline
         function handleFileInjection(e) {
             const file = e.target.files[0];
             if (!file) return;
@@ -268,7 +220,7 @@
                         Promise.all(countPromises).then(pagesText => {
                             activeMediaContext.type = 'pdf';
                             activeMediaContext.extractedText = pagesText.join('\n');
-                            showAttachmentPreview(`📄 Local PDF Data Stream Compiled: ${file.name} (${pdf.numPages} pgs)`);
+                            showAttachmentPreview(`📄 Local PDF Data Stream Compiled: ${file.name}`);
                         });
                     });
                 };
@@ -297,17 +249,16 @@
         function triggerMacro(type) {
             const promptBox = document.getElementById('user-prompt');
             if (type === 'docs') {
-                promptBox.value = "Review the following Aliyun documentation tracking parameters and extract its structural properties: ";
+                promptBox.value = "Review the following Aliyun documentation tracking parameters: ";
             } else if (type === 'research') {
-                promptBox.value = "Perform an architectural study guide breakdown regarding the code logic execution layer properties of: ";
+                promptBox.value = "Perform an architectural study guide breakdown regarding: ";
             } else if (type === 'expert') {
-                promptBox.value = "Act as an expert software advisor. Evaluate this structural deployment matrix: ";
+                promptBox.value = "Act as an expert software advisor. Evaluate this: ";
             }
             promptBox.focus();
             autoGrowTextarea(promptBox);
         }
 
-        // Primary Messaging Payload Orchestration Pipeline Call
         async function dispatchMessage() {
             const promptInput = document.getElementById('user-prompt');
             let textQuery = promptInput.value.trim();
@@ -319,11 +270,11 @@
 
             let userDisplayMessage = textQuery || `Triggered Context Pipeline Task: ${activeMediaContext.fileName || activeMediaContext.scrapedUrl}`;
 
-            // Handle Context Injection compilation setups (Web URLs / local documents vectors)
+            // FIXED STRING SYNTAX TO MATCH OLD PIPELINE
             if (activeMediaContext.type === 'pdf') {
-                textQuery = `[Context PDF Document Data Target: ${activeMediaContext.fileName}]\n${activeMediaContext.extractedText}\n\nUser Operational Request Question:\n${textQuery}`;
+                textQuery = `[Context Document: ${activeMediaContext.fileName}]\n${activeMediaContext.extractedText}\n\nUser Question:\n${textQuery}`;
             } else if (activeMediaContext.type === 'url') {
-                textQuery = `[External Scraper Hook Target Pipeline Active Route: ${activeMediaContext.scrapedUrl}]\n(Performing background remote scraping execution parameters extraction...)\n\nUser Directive Task Query:\n${textQuery}`;
+                textQuery = `[External Scraper Target Route: ${activeMediaContext.scrapedUrl}]\n\nUser Directive Task Query:\n${textQuery}`;
             }
 
             appendBubbleToDisplay(userDisplayMessage, true);
@@ -335,7 +286,7 @@
             promptInput.style.height = "auto";
             
             const streamBubbleId = "ai-stream-" + Date.now();
-            const responseWindow = appendBubbleToDisplay("Processing deep tokens vector arrays...", false, streamBubbleId);
+            const responseWindow = appendBubbleToDisplay("Processing tokens vector arrays...", false, streamBubbleId);
             
             const cachedMedia = { ...activeMediaContext };
             clearFileAttachment();
@@ -348,14 +299,14 @@
                     modelTarget = "qwen-vl-plus";
                     promptPayloadContent = [
                         { image: `data:image/jpeg;base64,${cachedMedia.base64}` },
-                        { text: textQuery || "Analyze this multi-vector image asset configuration layer." }
+                        { text: textQuery || "Analyze this image payload content." }
                     ];
                 }
 
                 const messagesPayload = [
                     {
                         role: "system",
-                        content: "You are Tahar Chatbot, an expert software architecture instructor and systems companion engineering platform agent. You are tasked with reading, parsing, configuring, creating, debugging, and explaining Python programming code structures. Always format Python expressions inside markdown code blocks (```python ... ```) and add thorough inline comments inside the block arrays describing structural actions."
+                        content: "You are Tahar Chatbot, an expert software architecture instructor. You are tasked with reading, parsing, configuring, creating, debugging, and explaining Python programming code structures. Always format Python expressions inside markdown code blocks (```python ... ```) and add thorough inline comments inside the block arrays describing structural actions."
                     },
                     ...chatSessions[activeChatId].slice(-8, -1),
                     { role: "user", content: promptPayloadContent }
@@ -374,7 +325,7 @@
                     })
                 });
 
-                if (!apiResponse.ok) throw new Error(`API Gateway Connection Exception Error State: ${apiResponse.status}`);
+                if (!apiResponse.ok) throw new Error(`API Gateway Error State: ${apiResponse.status}`);
                 
                 const dataJson = await apiResponse.json();
                 const responseOutputText = dataJson.output.choices[0].message.content;
@@ -387,14 +338,14 @@
 
             } catch (error) {
                 console.error(error);
-                responseWindow.innerHTML = `<span class="text-red-400 font-semibold text-xs border border-red-900/30 bg-red-950/20 px-3 py-2 rounded-xl block">System Pipeline Exception Encountered: ${error.message}. Confirm configuration settings properties matching on Line 133.</span>`;
+                responseWindow.innerHTML = `<span class="text-red-400 font-semibold text-xs border border-red-900/30 bg-red-950/20 px-3 py-2 rounded-xl block">System Pipeline Exception Encountered: ${error.message}</span>`;
             }
         }
 
         function appendBubbleToDisplay(text, isUser, forcedId = null) {
             const scrollContainer = document.getElementById('chat-window');
             const rowWrapper = document.createElement('div');
-            rowWrapper.className = `flex w-full ${isUser ? 'justify-end' : 'justify-start'} animate-fade-in`;
+            rowWrapper.className = `flex w-full ${isUser ? 'justify-end' : 'justify-start'}`;
             
             const messageBubble = document.createElement('div');
             if (forcedId) messageBubble.id = forcedId;
@@ -423,7 +374,6 @@
             document.getElementById('chat-window').scrollTop = document.getElementById('chat-window').scrollHeight;
         }
 
-        // Custom Highlight Handler System with Embedded Copy Buttons UI
         function attachCodeProcessingUtilities(mountNode) {
             mountNode.querySelectorAll('pre').forEach((preContainer) => {
                 preContainer.classList.add('relative', 'group');
@@ -472,7 +422,7 @@
                 
                 let snippet = "⚡ New Workspace Draft";
                 if (textHistory) {
-                    if (textHistory.content.startsWith('[Context PDF')) snippet = "📄 Analyzed PDF Document";
+                    if (textHistory.content.startsWith('[Context Document:')) snippet = "📄 Analyzed PDF Document";
                     else if (textHistory.content.startsWith('[External Scraper')) snippet = "🌐 Scraped Target Content";
                     else snippet = textHistory.content.substring(0, 22) + "...";
                 }
@@ -501,6 +451,7 @@
             reloadChatScreen();
         }
 
+        // FIXED TEXT SPLITTING FORMAT TO LOAD LOGS PROPERLY
         function reloadChatScreen() {
             const displayWindow = document.getElementById('chat-window');
             displayWindow.innerHTML = "";
@@ -510,7 +461,7 @@
                 displayWindow.innerHTML = `
                     <div id="welcome-message" class="max-w-xl mx-auto text-center py-20 space-y-5">
                         <div class="h-14 w-14 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center mx-auto shadow-xl shadow-blue-500/10">
-                            <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 21l8.982-11.73a.75.75 0 00-.57-1.306h-5.962l.813-5.096L4 14.615h5.962z"></path></svg>
+                            <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 21l8.982-11.73a.75.75 0 00-.57-1.306h-5.962l.813-5.096L4 14.615h5.962z"></path>
                         </div>
                         <div class="space-y-2">
                             <h2 class="text-2xl font-bold text-white tracking-tight">Welcome Back, Tahar</h2>
@@ -522,12 +473,12 @@
 
             logsArray.forEach(message => {
                 let cleanText = message.content;
-                if (message.content.startsWith('[Context PDF')) {
-                    const lines = message.content.split('\n\nUser Operational Request Question:\n');
-                    cleanText = lines.length > 1 ? lines[1] : "Analyzing Document Resources...";
+                if (message.content.startsWith('[Context Document:')) {
+                    const lines = message.content.split('\n\nUser Question:\n');
+                    cleanText = lines.length > 1 ? lines[1] : "Analyzing Document Context...";
                 } else if (message.content.startsWith('[External Scraper')) {
                     const lines = message.content.split('\n\nUser Directive Task Query:\n');
-                    cleanText = lines.length > 1 ? lines[1] : "Analyzing Scraped Web Route...";
+                    cleanText = lines.length > 1 ? lines[1] : "Analyzing Scraped Target Web Route...";
                 }
                 appendBubbleToDisplay(cleanText, message.role === 'user');
             });
