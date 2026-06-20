@@ -53,7 +53,7 @@
             </div>
             <div class="px-3 pb-2 text-[11px] font-bold tracking-wider text-gray-500 uppercase shrink-0">Recent Activity Logs</div>
             <div id="sessionHistoryList" class="flex-1 overflow-y-auto px-2 space-y-1 pb-4">
-                </div>
+            </div>
         </aside>
 
         <div class="flex-1 flex flex-col h-full overflow-hidden relative">
@@ -66,6 +66,24 @@
                     </div>
                 </div>
             </main>
+
+            <div id="cameraModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50">
+                <div class="bg-[#1e1f20] border border-[#3c3d42] rounded-2xl w-full max-w-md overflow-hidden flex flex-col shadow-2xl">
+                    <div class="p-4 border-b border-[#2d2f34] flex justify-between items-center bg-[#16171a]">
+                        <span class="text-sm font-semibold tracking-wide flex items-center gap-2"><i class="fas fa-video text-purple-400"></i> Capture Device Interface</span>
+                        <button type="button" id="closeCameraBtn" class="text-gray-400 hover:text-white"><i class="fas fa-times"></i></button>
+                    </div>
+                    <div class="relative bg-black aspect-video flex items-center justify-center">
+                        <video id="cameraStream" autoplay playsinline class="w-full h-full object-cover scale-x-[-1]"></video>
+                        <canvas id="cameraCanvas" class="hidden"></canvas>
+                    </div>
+                    <div class="p-4 bg-[#16171a] flex gap-3 justify-end">
+                        <button type="button" id="snapPhotoBtn" class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-xs px-4 py-2 rounded-xl flex items-center gap-1.5 transition-colors">
+                            <i class="fas fa-camera"></i> Capture Snapshot
+                        </button>
+                    </div>
+                </div>
+            </div>
 
             <footer class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-[#111214] via-[#111214] to-transparent pt-4 pb-6 flex justify-center px-4 z-10 shrink-0">
                 <div class="w-full max-w-3xl relative flex flex-col items-center">
@@ -84,9 +102,6 @@
                     <div id="mediaPreviewContainer" class="w-full hidden bg-[#1e1f20] p-3 mb-2 rounded-xl border border-[#3c3d42] justify-between items-center">
                         <div class="flex items-center gap-3">
                             <img id="imagePreview" class="h-14 w-14 rounded-lg object-cover border border-[#4b5563] hidden" src="" alt="Preview">
-                            <div id="videoPreviewIndicator" class="h-12 w-12 rounded-lg bg-blue-950/50 border border-blue-800 flex items-center justify-center text-blue-400 hidden">
-                                <i class="fas fa-video text-lg"></i>
-                            </div>
                             <div class="flex flex-col">
                                 <span id="mediaTypeLabel" class="text-xs text-emerald-400 font-semibold">Media staged</span>
                                 <span id="mediaDetailLabel" class="text-[11px] text-gray-400 max-w-md truncate">Details</span>
@@ -115,12 +130,12 @@
                     <form id="chatForm" class="w-full flex items-end bg-[#222327] border border-[#3c3d42] rounded-2xl px-4 py-3 shadow-2xl focus-within:border-gray-500 transition-colors">
                         <div class="flex items-center gap-3.5 mr-2 pb-1">
                             <input type="file" id="imageInput" accept="image/*" class="hidden">
-                            <button type="button" id="uploadImageBtn" class="text-gray-400 hover:text-emerald-400 transition-colors cursor-pointer" title="Take Photo or Album Upload">
-                                <i class="fas fa-camera text-xl"></i>
+                            <button type="button" id="uploadImageBtn" class="text-gray-400 hover:text-emerald-400 transition-colors cursor-pointer" title="Album Upload">
+                                <i class="fas fa-images text-xl"></i>
                             </button>
                             
-                            <button type="button" id="uploadVideoBtn" class="text-gray-400 hover:text-blue-400 transition-colors cursor-pointer" title="Analyze Remote Video URL">
-                                <i class="fas fa-video text-xl"></i>
+                            <button type="button" id="liveCameraTriggerBtn" class="text-gray-400 hover:text-blue-400 transition-colors cursor-pointer" title="Take Live Photo">
+                                <i class="fas fa-camera text-xl"></i>
                             </button>
 
                             <input type="file" id="pdfFileInput" accept=".pdf" class="hidden">
@@ -144,17 +159,16 @@
         const API_ENDPOINT = "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions";
         const MAX_HISTORY_MESSAGES = 12;
         
-        // ⬇️ ⬇️ PASTE YOUR ALIYUN API CODE INSIDE THE QUOTES BELOW (~Line 193) ⬇️ ⬇️
         const ALIYUN_API_KEY = "sk-c31927ba9ecd492d99830c199d06a5ec";
         const QWEN_MODEL = "qwen-vl-plus"; 
         
         // State Management Registers
         let chatHistory = [];
         let selectedImageBase64 = null;
-        let stagedVideoUrl = null;
         let extractedPdfText = "";
         let currentSessionId = null; 
         let chatSessionsRegistry = {}; 
+        let localMediaStream = null;
 
         // UI DOM Access Registry
         const DOM = {
@@ -172,10 +186,9 @@
 
         const imageInput = document.getElementById('imageInput');
         const uploadImageBtn = document.getElementById('uploadImageBtn');
-        const uploadVideoBtn = document.getElementById('uploadVideoBtn');
+        const liveCameraTriggerBtn = document.getElementById('liveCameraTriggerBtn');
         const mediaPreviewContainer = document.getElementById('mediaPreviewContainer');
         const imagePreview = document.getElementById('imagePreview');
-        const videoPreviewIndicator = document.getElementById('videoPreviewIndicator');
         const mediaTypeLabel = document.getElementById('mediaTypeLabel');
         const mediaDetailLabel = document.getElementById('mediaDetailLabel');
         const removeMediaBtn = document.getElementById('removeMediaBtn');
@@ -185,6 +198,13 @@
         const removePdfBtn = document.getElementById('removePdfBtn');
         const pdfStatus = document.getElementById('pdfStatus');
         const pdfStatusBadge = document.getElementById('pdfStatusBadge');
+
+        // Live Camera Component DOM References
+        const cameraModal = document.getElementById('cameraModal');
+        const closeCameraBtn = document.getElementById('closeCameraBtn');
+        const cameraStream = document.getElementById('cameraStream');
+        const cameraCanvas = document.getElementById('cameraCanvas');
+        const snapPhotoBtn = document.getElementById('snapPhotoBtn');
 
         // Target Global Session Storage Synchronizers
         function loadSessionsFromLocalStorage() {
@@ -327,9 +347,8 @@
         function evaluateButtonStatus() {
             const hasText = DOM.input.value.trim().length > 0;
             const hasImage = selectedImageBase64 !== null;
-            const hasVideo = stagedVideoUrl !== null;
             const hasPdf = extractedPdfText.length > 0;
-            DOM.sendBtn.disabled = !(hasText || hasImage || hasVideo || hasPdf);
+            DOM.sendBtn.disabled = !(hasText || hasImage || hasPdf);
         }
 
         DOM.input.addEventListener('input', function() {
@@ -353,14 +372,12 @@
         imageInput.addEventListener('change', (e) => {
             const file = e.target.files[0];
             if (!file) return;
-            stagedVideoUrl = null;
-            videoPreviewIndicator.classList.add('hidden');
             const reader = new FileReader();
             reader.onload = (event) => {
                 selectedImageBase64 = event.target.result;
                 imagePreview.src = selectedImageBase64;
                 imagePreview.classList.remove('hidden');
-                mediaTypeLabel.innerText = "Photo Selected (Album/Camera)";
+                mediaTypeLabel.innerText = "Photo Selected (Album)";
                 mediaTypeLabel.className = "text-xs text-emerald-400 font-semibold";
                 mediaDetailLabel.innerText = file.name;
                 mediaPreviewContainer.classList.replace('hidden', 'flex');
@@ -369,31 +386,58 @@
             reader.readAsDataURL(file);
         });
 
-        // --- VIDEO LOADER LOGIC ---
-        uploadVideoBtn.addEventListener('click', () => {
-            const url = prompt("Please paste your public video URL link:");
-            if (!url) return;
-            if(!url.trim().startsWith("http")) {
-                alert("Please enter a valid web URL link starting with http:// or https://");
-                return;
+        // --- LIVE CAMERA SNAPSHOT LOGIC ---
+        liveCameraTriggerBtn.addEventListener('click', async () => {
+            try {
+                localMediaStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" }, audio: false });
+                cameraStream.srcObject = localMediaStream;
+                cameraModal.classList.remove('hidden');
+            } catch (err) {
+                console.error("Camera access failed:", err);
+                alert("Unable to open camera. Please check browser privacy settings permissions.");
             }
-            selectedImageBase64 = null;
-            imagePreview.classList.add('hidden');
-            stagedVideoUrl = url.trim();
-            videoPreviewIndicator.classList.remove('hidden');
-            mediaTypeLabel.innerText = "Video URL Attached";
-            mediaTypeLabel.className = "text-xs text-blue-400 font-semibold";
-            mediaDetailLabel.innerText = stagedVideoUrl;
+        });
+
+        function shutDownCameraHardware() {
+            if (localMediaStream) {
+                localMediaStream.getTracks().forEach(track => track.stop());
+                localMediaStream = null;
+            }
+            cameraStream.srcObject = null;
+            cameraModal.classList.add('hidden');
+        }
+
+        closeCameraBtn.addEventListener('click', shutDownCameraHardware);
+
+        snapPhotoBtn.addEventListener('click', () => {
+            if (!cameraStream.srcObject) return;
+            
+            cameraCanvas.width = cameraStream.videoWidth || 640;
+            cameraCanvas.height = cameraStream.videoHeight || 480;
+            const ctx = cameraCanvas.getContext('2d');
+            
+            // Mirror flip calculation match
+            ctx.translate(cameraCanvas.width, 0);
+            ctx.scale(-1, 1);
+            ctx.drawImage(cameraStream, 0, 0, cameraCanvas.width, cameraCanvas.height);
+            
+            selectedImageBase64 = cameraCanvas.toDataURL('image/jpeg');
+            imagePreview.src = selectedImageBase64;
+            imagePreview.classList.remove('hidden');
+            
+            mediaTypeLabel.innerText = "Live Snapshot Captured";
+            mediaTypeLabel.className = "text-xs text-emerald-400 font-semibold";
+            mediaDetailLabel.innerText = `snapshot_${Date.now()}.jpg`;
             mediaPreviewContainer.classList.replace('hidden', 'flex');
+            
+            shutDownCameraHardware();
             evaluateButtonStatus();
         });
 
         removeMediaBtn.addEventListener('click', () => {
             selectedImageBase64 = null;
-            stagedVideoUrl = null;
             imageInput.value = '';
             imagePreview.classList.add('hidden');
-            videoPreviewIndicator.classList.add('hidden');
             mediaPreviewContainer.classList.replace('flex', 'hidden');
             evaluateButtonStatus();
         });
@@ -562,15 +606,8 @@
                 });
                 visualChatDisplayMessage = `<div class="flex items-center gap-2 mb-1.5 text-xs text-emerald-400 font-semibold"><i class="fas fa-camera"></i> Attached Photo Analyzed</div>` + (messageInputText || `<span class="italic text-gray-400">Inspecting uploaded image file...</span>`);
             } 
-            else if (stagedVideoUrl) {
-                contentPayload.push({
-                    "type": "video",
-                    "video": [ stagedVideoUrl ]
-                });
-                visualChatDisplayMessage = `<div class="flex items-center gap-2 mb-1.5 text-xs text-blue-400 font-semibold"><i class="fas fa-video"></i> Streaming Web Video Reference</div><div class="text-[11px] text-gray-400 truncate mb-1 bg-[#1a1b1e] p-1 rounded border border-[#2d2f34] max-w-sm">${stagedVideoUrl}</div>` + (messageInputText || `<span class="italic text-gray-400">Processing video clip feeds...</span>`);
-            }
 
-            if (processedPromptText || (!selectedImageBase64 && !stagedVideoUrl)) {
+            if (processedPromptText || !selectedImageBase64) {
                 contentPayload.push({
                     "type": "text",
                     "text": processedPromptText || "Analyze the attached material."
@@ -592,10 +629,8 @@
             saveSessionsToLocalStorage();
 
             selectedImageBase64 = null;
-            stagedVideoUrl = null;
             imageInput.value = '';
             imagePreview.classList.add('hidden');
-            videoPreviewIndicator.classList.add('hidden');
             mediaPreviewContainer.classList.replace('flex', 'hidden');
 
             const aiNode = appendMessage('assistant', '<i class="fas fa-circle-notch fa-spin text-purple-400"></i> Parsing context data streams...');
